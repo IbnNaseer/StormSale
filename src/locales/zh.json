@@ -1,0 +1,56 @@
+{
+  "nav": {
+    "home": "首页",
+    "aboutUs": "关于我们",
+    "features": "特色功能",
+    "howItWorks": "运作方式",
+    "pricing": "价格方案",
+    "stats": "数据统计",
+    "community": "社区",
+    "faq": "常见问题",
+    "contact": "联系我们"
+  },
+  "header": {
+    "connectWallet": "连接钱包",
+    "disconnect": "断开连接",
+    "switchLanguage": "切换语言",
+    "theme": "切换主题"
+  },
+  "common": {
+    "loading": "加载中...",
+    "error": "出错了",
+    "retry": "重试",
+    "close": "关闭",
+    "save": "保存",
+    "cancel": "取消",
+    "confirm": "确认",
+    "copy": "复制",
+    "copied": "已复制！",
+    "status": "状态",
+    "search": "搜索"
+  },
+  "dashboard": {
+    "title": "控制面板",
+    "subtitle": "管理您的推广业务与绩效表现",
+    "overview": "概览",
+    "totalEarnings": "总收益",
+    "activeCampaigns": "进行中活动",
+    "conversionRate": "转化率",
+    "escrowBalance": "托管余额"
+  },
+  "affiliate": {
+    "title": "联盟推广中心",
+    "referrals": "推荐人数",
+    "commissionRate": "佣金比例",
+    "payouts": "提现记录",
+    "myLinks": "我的推广链接",
+    "generateLink": "生成链接"
+  },
+  "advertiser": {
+    "title": "广告主中心",
+    "createCampaign": "创建推广活动",
+    "campaignBudget": "活动预算",
+    "topAffiliates": "优秀推广员",
+    "autoRefill": "自动充值"
+  }
+}

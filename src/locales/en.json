@@ -1,0 +1,56 @@
+{
+  "nav": {
+    "home": "Home",
+    "aboutUs": "About Us",
+    "features": "Features",
+    "howItWorks": "How it Works",
+    "pricing": "Pricing",
+    "stats": "Stats",
+    "community": "Community",
+    "faq": "FAQ",
+    "contact": "Contact"
+  },
+  "header": {
+    "connectWallet": "Connect Wallet",
+    "disconnect": "Disconnect",
+    "switchLanguage": "Switch Language",
+    "theme": "Toggle Theme"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Retry",
+    "close": "Close",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "status": "Status",
+    "search": "Search"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Manage your affiliate operations and performance",
+    "overview": "Overview",
+    "totalEarnings": "Total Earnings",
+    "activeCampaigns": "Active Campaigns",
+    "conversionRate": "Conversion Rate",
+    "escrowBalance": "Escrow Balance"
+  },
+  "affiliate": {
+    "title": "Affiliate Portal",
+    "referrals": "Referrals",
+    "commissionRate": "Commission Rate",
+    "payouts": "Payouts",
+    "myLinks": "My Tracking Links",
+    "generateLink": "Generate Link"
+  },
+  "advertiser": {
+    "title": "Advertiser Portal",
+    "createCampaign": "Create Campaign",
+    "campaignBudget": "Campaign Budget",
+    "topAffiliates": "Top Affiliates",
+    "autoRefill": "Auto Refill"
+  }
+}

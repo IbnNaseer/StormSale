@@ -1,0 +1,56 @@
+{
+  "nav": {
+    "home": "الرئيسية",
+    "aboutUs": "من نحن",
+    "features": "المميزات",
+    "howItWorks": "كيف يعمل",
+    "pricing": "الأسعار",
+    "stats": "الإحصائيات",
+    "community": "المجتمع",
+    "faq": "الأسئلة الشائعة",
+    "contact": "اتصل بنا"
+  },
+  "header": {
+    "connectWallet": "ربط المحفظة",
+    "disconnect": "قطع الاتصال",
+    "switchLanguage": "تغيير اللغة",
+    "theme": "تبديل المظهر"
+  },
+  "common": {
+    "loading": "جار التحميل...",
+    "error": "حدث خطأ ما",
+    "retry": "إعادة المحاولة",
+    "close": "إغلاق",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد",
+    "copy": "نسخ",
+    "copied": "تم النسخ!",
+    "status": "الحالة",
+    "search": "بحث"
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "subtitle": "إدارة عمليات التسويق بالعمولة والأداء الخاص بك",
+    "overview": "نظرة عامة",
+    "totalEarnings": "إجمالي الأرباح",
+    "activeCampaigns": "الحملات النشطة",
+    "conversionRate": "معدل التحويل",
+    "escrowBalance": "رصيد الضمان"
+  },
+  "affiliate": {
+    "title": "بوابة المسوقين",
+    "referrals": "الإحالات",
+    "commissionRate": "نسبة العمولة",
+    "payouts": "المدفوعات",
+    "myLinks": "روابط التتبع الخاصة بي",
+    "generateLink": "إنشاء رابط"
+  },
+  "advertiser": {
+    "title": "بوابة المعلنين",
+    "createCampaign": "إنشاء حملة",
+    "campaignBudget": "ميزانية الحملة",
+    "topAffiliates": "أفضل المسوقين",
+    "autoRefill": "إعادة التعبئة التلقائية"
+  }
+}

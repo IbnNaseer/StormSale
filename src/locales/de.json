@@ -1,0 +1,56 @@
+{
+  "nav": {
+    "home": "Startseite",
+    "aboutUs": "Über Uns",
+    "features": "Funktionen",
+    "howItWorks": "So funktioniert es",
+    "pricing": "Preise",
+    "stats": "Statistiken",
+    "community": "Community",
+    "faq": "FAQ",
+    "contact": "Kontakt"
+  },
+  "header": {
+    "connectWallet": "Wallet verbinden",
+    "disconnect": "Trennen",
+    "switchLanguage": "Sprache wechseln",
+    "theme": "Design wechseln"
+  },
+  "common": {
+    "loading": "Wird geladen...",
+    "error": "Etwas ist schiefgelaufen",
+    "retry": "Wiederholen",
+    "close": "Schließen",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "copy": "Kopieren",
+    "copied": "Kopiert!",
+    "status": "Status",
+    "search": "Suchen"
+  },
+  "dashboard": {
+    "title": "Übersicht",
+    "subtitle": "Verwalten Sie Ihre Affiliate-Aktivitäten und Leistungen",
+    "overview": "Überblick",
+    "totalEarnings": "Gesamteinnahmen",
+    "activeCampaigns": "Aktive Kampagnen",
+    "conversionRate": "Konversionsrate",
+    "escrowBalance": "Treuhandguthaben"
+  },
+  "affiliate": {
+    "title": "Affiliate-Portal",
+    "referrals": "Empfehlungen",
+    "commissionRate": "Provisionssatz",
+    "payouts": "Auszahlungen",
+    "myLinks": "Meine Tracking-Links",
+    "generateLink": "Link generieren"
+  },
+  "advertiser": {
+    "title": "Werbetreibenden-Portal",
+    "createCampaign": "Kampagne erstellen",
+    "campaignBudget": "Kampagnenbudget",
+    "topAffiliates": "Top-Affiliates",
+    "autoRefill": "Automatische Nachfüllung"
+  }
+}

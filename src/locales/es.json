@@ -1,0 +1,56 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "aboutUs": "Sobre Nosotros",
+    "features": "Características",
+    "howItWorks": "Cómo Funciona",
+    "pricing": "Precios",
+    "stats": "Estadísticas",
+    "community": "Comunidad",
+    "faq": "Preguntas Frecuentes",
+    "contact": "Contacto"
+  },
+  "header": {
+    "connectWallet": "Conectar Billetera",
+    "disconnect": "Desconectar",
+    "switchLanguage": "Cambiar Idioma",
+    "theme": "Cambiar Tema"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Algo salió mal",
+    "retry": "Reintentar",
+    "close": "Cerrar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "copy": "Copiar",
+    "copied": "¡Copiado!",
+    "status": "Estado",
+    "search": "Buscar"
+  },
+  "dashboard": {
+    "title": "Panel de Control",
+    "subtitle": "Administre sus operaciones de afiliados y rendimiento",
+    "overview": "Resumen",
+    "totalEarnings": "Ganancias Totales",
+    "activeCampaigns": "Campañas Activas",
+    "conversionRate": "Tasa de Conversión",
+    "escrowBalance": "Saldo en Garantía"
+  },
+  "affiliate": {
+    "title": "Portal de Afiliados",
+    "referrals": "Referencias",
+    "commissionRate": "Tasa de Comisión",
+    "payouts": "Pagos",
+    "myLinks": "Mis Enlaces de Rastreo",
+    "generateLink": "Generar Enlace"
+  },
+  "advertiser": {
+    "title": "Portal de Anunciantes",
+    "createCampaign": "Crear Campaña",
+    "campaignBudget": "Presupuesto de Campaña",
+    "topAffiliates": "Mejores Afiliados",
+    "autoRefill": "Recarga Automática"
+  }
+}

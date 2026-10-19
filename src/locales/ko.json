@@ -1,0 +1,56 @@
+{
+  "nav": {
+    "home": "홈",
+    "aboutUs": "소개",
+    "features": "주요 기능",
+    "howItWorks": "작동 방식",
+    "pricing": "요금 안내",
+    "stats": "통계",
+    "community": "커뮤니티",
+    "faq": "자주 묻는 질문",
+    "contact": "문의하기"
+  },
+  "header": {
+    "connectWallet": "지갑 연결",
+    "disconnect": "연결 해제",
+    "switchLanguage": "언어 변경",
+    "theme": "테마 전환"
+  },
+  "common": {
+    "loading": "로딩 중...",
+    "error": "오류가 발생했습니다",
+    "retry": "다시 시도",
+    "close": "닫기",
+    "save": "저장",
+    "cancel": "취소",
+    "confirm": "확인",
+    "copy": "복사",
+    "copied": "복사되었습니다!",
+    "status": "상태",
+    "search": "검색"
+  },
+  "dashboard": {
+    "title": "대시보드",
+    "subtitle": "제휴 운영 및 성과를 한눈에 관리하세요",
+    "overview": "개요",
+    "totalEarnings": "총 수익",
+    "activeCampaigns": "진행 중인 캠페인",
+    "conversionRate": "전환율",
+    "escrowBalance": "에스크로 잔액"
+  },
+  "affiliate": {
+    "title": "제휴 포털",
+    "referrals": "추천수",
+    "commissionRate": "수수료율",
+    "payouts": "지급 내역",
+    "myLinks": "내 추적 링크",
+    "generateLink": "링크 생성"
+  },
+  "advertiser": {
+    "title": "광고주 포털",
+    "createCampaign": "캠페인 만들기",
+    "campaignBudget": "캠페인 예산",
+    "topAffiliates": "우수 제휴자",
+    "autoRefill": "자동 충전"
+  }
+}

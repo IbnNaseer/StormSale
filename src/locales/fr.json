@@ -1,0 +1,56 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "aboutUs": "À Propos",
+    "features": "Fonctionnalités",
+    "howItWorks": "Comment ça marche",
+    "pricing": "Tarification",
+    "stats": "Statistiques",
+    "community": "Communauté",
+    "faq": "FAQ",
+    "contact": "Contact"
+  },
+  "header": {
+    "connectWallet": "Connecter Portefeuille",
+    "disconnect": "Déconnecter",
+    "switchLanguage": "Changer de Langue",
+    "theme": "Changer de Thème"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue",
+    "retry": "Réessayer",
+    "close": "Fermer",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "copy": "Copier",
+    "copied": "Copié !",
+    "status": "Statut",
+    "search": "Rechercher"
+  },
+  "dashboard": {
+    "title": "Tableau de Bord",
+    "subtitle": "Gérez vos opérations d'affiliation et vos performances",
+    "overview": "Aperçu",
+    "totalEarnings": "Gains Totaux",
+    "activeCampaigns": "Campagnes Actives",
+    "conversionRate": "Taux de Conversion",
+    "escrowBalance": "Solde du Séquestre"
+  },
+  "affiliate": {
+    "title": "Portail Affilié",
+    "referrals": "Parrainages",
+    "commissionRate": "Taux de Commission",
+    "payouts": "Paiements",
+    "myLinks": "Mes Liens de Suivi",
+    "generateLink": "Générer un Lien"
+  },
+  "advertiser": {
+    "title": "Portail Annonceur",
+    "createCampaign": "Créer une Campagne",
+    "campaignBudget": "Budget de Campagne",
+    "topAffiliates": "Meilleurs Affiliés",
+    "autoRefill": "Recharge Automatique"
+  }
+}

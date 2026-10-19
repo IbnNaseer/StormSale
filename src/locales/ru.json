@@ -1,0 +1,56 @@
+{
+  "nav": {
+    "home": "Главная",
+    "aboutUs": "О нас",
+    "features": "Возможности",
+    "howItWorks": "Как это работает",
+    "pricing": "Тарифы",
+    "stats": "Статистика",
+    "community": "Сообщество",
+    "faq": "Частые вопросы",
+    "contact": "Контакты"
+  },
+  "header": {
+    "connectWallet": "Подключить кошелек",
+    "disconnect": "Отключить",
+    "switchLanguage": "Сменить язык",
+    "theme": "Сменить тему"
+  },
+  "common": {
+    "loading": "Загрузка...",
+    "error": "Что-то пошло не так",
+    "retry": "Повторить",
+    "close": "Закрыть",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "confirm": "Подтвердить",
+    "copy": "Копировать",
+    "copied": "Скопировано!",
+    "status": "Статус",
+    "search": "Поиск"
+  },
+  "dashboard": {
+    "title": "Панель управления",
+    "subtitle": "Управляйте партнерскими программами и эффективностью",
+    "overview": "Обзор",
+    "totalEarnings": "Общий доход",
+    "activeCampaigns": "Активные кампании",
+    "conversionRate": "Коэффициент конверсии",
+    "escrowBalance": "Баланс эскроу"
+  },
+  "affiliate": {
+    "title": "Партнерский портал",
+    "referrals": "Рефералы",
+    "commissionRate": "Ставка комиссии",
+    "payouts": "Выплаты",
+    "myLinks": "Мои реферальные ссылки",
+    "generateLink": "Создать ссылку"
+  },
+  "advertiser": {
+    "title": "Портал рекламодателя",
+    "createCampaign": "Создать кампанию",
+    "campaignBudget": "Бюджет кампании",
+    "topAffiliates": "Лучшие партнеры",
+    "autoRefill": "Автопополнение"
+  }
+}

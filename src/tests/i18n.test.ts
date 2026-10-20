@@ -82,6 +82,28 @@ describe("i18n Internationalization Framework", () => {
     });
   });
 
+  it("should have matching dashboard keys across all locales", () => {
+    const enDashboardKeys = Object.keys(en.dashboard).sort();
+    const localeObjects = [
+      { name: "es", data: es },
+      { name: "pt", data: pt },
+      { name: "fr", data: fr },
+      { name: "de", data: de },
+      { name: "zh", data: zh },
+      { name: "ja", data: ja },
+      { name: "ko", data: ko },
+      { name: "ar", data: ar },
+      { name: "ru", data: ru },
+    ];
+
+    localeObjects.forEach(({ name, data }) => {
+      expect(
+        Object.keys(data.dashboard).sort(),
+        `Locale ${name} dashboard keys do not match en.dashboard`,
+      ).toEqual(enDashboardKeys);
+    });
+  });
+
   it("should accurately detect Right-to-Left (RTL) languages", () => {
     expect(RTL_LOCALES).toEqual(["ar", "he"]);
     expect(isRTL("ar")).toBe(true);

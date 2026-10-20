@@ -36,7 +36,25 @@
     "totalEarnings": "إجمالي الأرباح",
     "activeCampaigns": "الحملات النشطة",
     "conversionRate": "معدل التحويل",
-    "escrowBalance": "رصيد الضمان"
+    "escrowBalance": "رصيد الضمان",
+    "affiliateDashboard": "لوحة تحكم المسوق بالعمولة",
+    "affiliateSubtitle": "تتبع أداءك وضاعف أرباحك على البلوكتشين.",
+    "quickStartGuide": "دليل البدء السريع",
+    "activeReferrals": "الإحالات النشطة",
+    "monthlyGoal": "الهدف الشهري",
+    "recentPayouts": "المدفوعات الأخيرة",
+    "recentPayoutsSubtitle": "أحدث مدفوعات العمولات الخاصة بك",
+    "viewAllPayouts": "عرض جميع المدفوعات",
+    "performanceTips": "نصائح تحسين الأداء",
+    "performanceTipsSubtitle": "عزز أرباح التسويق بالعمولة لديك",
+    "quickActions": "إجراءات سريعة",
+    "quickActionsSubtitle": "ابدأ بسرعة",
+    "joinNewCampaign": "الانضمام إلى حملة جديدة",
+    "joinNewCampaignDesc": "اكتشف حملات عالية العائد",
+    "trackPerformance": "تتبع الأداء",
+    "trackPerformanceDesc": "عرض التحليلات والرؤى",
+    "withdrawEarnings": "سحب الأرباح",
+    "withdrawEarningsDesc": "طالب بعمولاتك"
   },
   "affiliate": {
     "title": "بوابة المسوقين",
@@ -44,7 +62,15 @@
     "commissionRate": "نسبة العمولة",
     "payouts": "المدفوعات",
     "myLinks": "روابط التتبع الخاصة بي",
-    "generateLink": "إنشاء رابط"
+    "generateLink": "إنشاء رابط",
+    "roleName": "المسوق المحترف",
+    "dashboardOverview": "نظرة عامة على لوحة التحكم",
+    "telegramCampaigns": "حملات تيليجرام",
+    "joinCampaign": "الانضمام إلى الحملة",
+    "mySales": "مبيعاتي وعمولاتي",
+    "claimPayouts": "المطالبة بالمدفوعات",
+    "personalizedSettings": "الإعدادات المخصصة",
+    "securityKeys": "الأمان والمفاتيح"
   },
   "advertiser": {
     "title": "بوابة المعلنين",

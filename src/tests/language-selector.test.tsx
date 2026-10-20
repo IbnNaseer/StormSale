@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { renderToString } from "react-dom/server";
 import { LanguageSelector } from "../components/shared/LanguageSelector";
-import i18n from "../lib/i18n";
+import i18n, { SUPPORTED_LOCALES } from "../lib/i18n";
 
 describe("LanguageSelector Component", () => {
   beforeEach(async () => {
@@ -18,6 +18,7 @@ describe("LanguageSelector Component", () => {
     const html = renderToString(<LanguageSelector />);
     expect(html).toContain('aria-haspopup="listbox"');
     expect(html).toContain('aria-expanded="false"');
+    expect(html).toContain('aria-label="Switch Language"');
   });
 
   it("should render the active locale code and flag", () => {
@@ -44,5 +45,11 @@ describe("LanguageSelector Component", () => {
     const html = renderToString(<LanguageSelector />);
     expect(html).toContain("AR");
     expect(html).toContain("🇸🇦");
+  });
+
+  it("should support all 10 locales in metadata", () => {
+    expect(SUPPORTED_LOCALES.length).toBe(10);
+    const codes = SUPPORTED_LOCALES.map((l) => l.code);
+    expect(codes).toEqual(["en", "es", "pt", "fr", "de", "zh", "ja", "ko", "ar", "ru"]);
   });
 });

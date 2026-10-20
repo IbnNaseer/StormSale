@@ -36,7 +36,25 @@
     "totalEarnings": "Gains Totaux",
     "activeCampaigns": "Campagnes Actives",
     "conversionRate": "Taux de Conversion",
-    "escrowBalance": "Solde du Séquestre"
+    "escrowBalance": "Solde du Séquestre",
+    "affiliateDashboard": "Tableau de Bord Affilié",
+    "affiliateSubtitle": "Suivez vos performances et maximisez vos gains sur la blockchain.",
+    "quickStartGuide": "Guide de Démarrage Rapide",
+    "activeReferrals": "Parrainages Actifs",
+    "monthlyGoal": "Objectif Mensuel",
+    "recentPayouts": "Paiements Récents",
+    "recentPayoutsSubtitle": "Vos derniers versements de commissions",
+    "viewAllPayouts": "Voir Tous les Paiements",
+    "performanceTips": "Conseils de Performance",
+    "performanceTipsSubtitle": "Augmentez vos revenus d'affiliation",
+    "quickActions": "Actions Rapides",
+    "quickActionsSubtitle": "Commencez rapidement",
+    "joinNewCampaign": "Rejoindre une Nouvelle Campagne",
+    "joinNewCampaignDesc": "Découvrez des campagnes rémunératrices",
+    "trackPerformance": "Suivre les Performances",
+    "trackPerformanceDesc": "Consultez les analyses et statistiques",
+    "withdrawEarnings": "Retirer les Gains",
+    "withdrawEarningsDesc": "Réclamez vos commissions"
   },
   "affiliate": {
     "title": "Portail Affilié",
@@ -44,7 +62,15 @@
     "commissionRate": "Taux de Commission",
     "payouts": "Paiements",
     "myLinks": "Mes Liens de Suivi",
-    "generateLink": "Générer un Lien"
+    "generateLink": "Générer un Lien",
+    "roleName": "Affilié Pro",
+    "dashboardOverview": "Aperçu du Tableau de Bord",
+    "telegramCampaigns": "Campagnes Telegram",
+    "joinCampaign": "Rejoindre la Campagne",
+    "mySales": "Mes Ventes & Commissions",
+    "claimPayouts": "Réclamer les Paiements",
+    "personalizedSettings": "Paramètres Personnalisés",
+    "securityKeys": "Sécurité & Clés"
   },
   "advertiser": {
     "title": "Portail Annonceur",

@@ -36,7 +36,25 @@
     "totalEarnings": "Gesamteinnahmen",
     "activeCampaigns": "Aktive Kampagnen",
     "conversionRate": "Konversionsrate",
-    "escrowBalance": "Treuhandguthaben"
+    "escrowBalance": "Treuhandguthaben",
+    "affiliateDashboard": "Affiliate-Dashboard",
+    "affiliateSubtitle": "Verfolgen Sie Ihre Leistung und maximieren Sie Ihre On-Chain-Einnahmen.",
+    "quickStartGuide": "Schnellstartanleitung",
+    "activeReferrals": "Aktive Empfehlungen",
+    "monthlyGoal": "Monatsziel",
+    "recentPayouts": "Kürzliche Auszahlungen",
+    "recentPayoutsSubtitle": "Ihre neuesten Provisionszahlungen",
+    "viewAllPayouts": "Alle Auszahlungen Anzeigen",
+    "performanceTips": "Leistungstipps",
+    "performanceTipsSubtitle": "Steigern Sie Ihre Affiliate-Einnahmen",
+    "quickActions": "Schnellaktionen",
+    "quickActionsSubtitle": "Schnell loslegen",
+    "joinNewCampaign": "Neuer Kampagne Beitreten",
+    "joinNewCampaignDesc": "Entdecken Sie hochbezahlte Kampagnen",
+    "trackPerformance": "Leistung Verfolgen",
+    "trackPerformanceDesc": "Analysen und Einblicke anzeigen",
+    "withdrawEarnings": "Einnahmen Auszahlen",
+    "withdrawEarningsDesc": "Fordern Sie Ihre Provisionen an"
   },
   "affiliate": {
     "title": "Affiliate-Portal",
@@ -44,7 +62,15 @@
     "commissionRate": "Provisionssatz",
     "payouts": "Auszahlungen",
     "myLinks": "Meine Tracking-Links",
-    "generateLink": "Link generieren"
+    "generateLink": "Link generieren",
+    "roleName": "Affiliate Pro",
+    "dashboardOverview": "Dashboard-Übersicht",
+    "telegramCampaigns": "Telegram-Kampagnen",
+    "joinCampaign": "Kampagne Beitreten",
+    "mySales": "Meine Verkäufe & Provisionen",
+    "claimPayouts": "Auszahlungen Anfordern",
+    "personalizedSettings": "Personalisierte Einstellungen",
+    "securityKeys": "Sicherheit & Schlüssel"
   },
   "advertiser": {
     "title": "Werbetreibenden-Portal",

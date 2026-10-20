@@ -36,7 +36,25 @@
     "totalEarnings": "Total Earnings",
     "activeCampaigns": "Active Campaigns",
     "conversionRate": "Conversion Rate",
-    "escrowBalance": "Escrow Balance"
+    "escrowBalance": "Escrow Balance",
+    "affiliateDashboard": "Affiliate Dashboard",
+    "affiliateSubtitle": "Track your performance and maximize your on-chain earnings.",
+    "quickStartGuide": "Quick Start Guide",
+    "activeReferrals": "Active Referrals",
+    "monthlyGoal": "Monthly Goal",
+    "recentPayouts": "Recent Payouts",
+    "recentPayoutsSubtitle": "Your latest commission payments",
+    "viewAllPayouts": "View All Payouts",
+    "performanceTips": "Performance Tips",
+    "performanceTipsSubtitle": "Boost your affiliate earnings",
+    "quickActions": "Quick Actions",
+    "quickActionsSubtitle": "Get started quickly",
+    "joinNewCampaign": "Join New Campaign",
+    "joinNewCampaignDesc": "Discover high-paying campaigns",
+    "trackPerformance": "Track Performance",
+    "trackPerformanceDesc": "View analytics and insights",
+    "withdrawEarnings": "Withdraw Earnings",
+    "withdrawEarningsDesc": "Claim your commissions"
   },
   "affiliate": {
     "title": "Affiliate Portal",
@@ -44,7 +62,15 @@
     "commissionRate": "Commission Rate",
     "payouts": "Payouts",
     "myLinks": "My Tracking Links",
-    "generateLink": "Generate Link"
+    "generateLink": "Generate Link",
+    "roleName": "Affiliate Pro",
+    "dashboardOverview": "Dashboard Overview",
+    "telegramCampaigns": "Telegram Campaigns",
+    "joinCampaign": "Join Campaign",
+    "mySales": "My Sales & Commissions",
+    "claimPayouts": "Claim Payouts",
+    "personalizedSettings": "Personalized Settings",
+    "securityKeys": "Security & Keys"
   },
   "advertiser": {
     "title": "Advertiser Portal",

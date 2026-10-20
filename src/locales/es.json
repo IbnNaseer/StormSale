@@ -36,7 +36,25 @@
     "totalEarnings": "Ganancias Totales",
     "activeCampaigns": "Campañas Activas",
     "conversionRate": "Tasa de Conversión",
-    "escrowBalance": "Saldo en Garantía"
+    "escrowBalance": "Saldo en Garantía",
+    "affiliateDashboard": "Panel de Afiliados",
+    "affiliateSubtitle": "Siga su rendimiento y maximice sus ganancias en la cadena.",
+    "quickStartGuide": "Guía de Inicio Rápido",
+    "activeReferrals": "Referencias Activas",
+    "monthlyGoal": "Meta Mensual",
+    "recentPayouts": "Pagos Recientes",
+    "recentPayoutsSubtitle": "Sus últimos pagos de comisiones",
+    "viewAllPayouts": "Ver Todos los Pagos",
+    "performanceTips": "Consejos de Rendimiento",
+    "performanceTipsSubtitle": "Mejore sus ganancias de afiliado",
+    "quickActions": "Acciones Rápidas",
+    "quickActionsSubtitle": "Comience rápidamente",
+    "joinNewCampaign": "Unirse a Nueva Campaña",
+    "joinNewCampaignDesc": "Descubra campañas de alta remuneración",
+    "trackPerformance": "Seguimiento de Rendimiento",
+    "trackPerformanceDesc": "Ver análisis e información",
+    "withdrawEarnings": "Retirar Ganancias",
+    "withdrawEarningsDesc": "Reclame sus comisiones"
   },
   "affiliate": {
     "title": "Portal de Afiliados",
@@ -44,7 +62,15 @@
     "commissionRate": "Tasa de Comisión",
     "payouts": "Pagos",
     "myLinks": "Mis Enlaces de Rastreo",
-    "generateLink": "Generar Enlace"
+    "generateLink": "Generar Enlace",
+    "roleName": "Afiliado Pro",
+    "dashboardOverview": "Resumen del Panel",
+    "telegramCampaigns": "Campañas de Telegram",
+    "joinCampaign": "Unirse a Campaña",
+    "mySales": "Mis Ventas y Comisiones",
+    "claimPayouts": "Reclamar Pagos",
+    "personalizedSettings": "Configuraciones Personalizadas",
+    "securityKeys": "Seguridad y Claves"
   },
   "advertiser": {
     "title": "Portal de Anunciantes",

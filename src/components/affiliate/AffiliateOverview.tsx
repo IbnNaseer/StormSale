@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 import QRCode from "qrcode";
 import {
   Card,
@@ -237,21 +238,33 @@ const AffiliateLinkGenerator = () => {
 };
 
 export const AffiliateOverview = () => {
+  const { t } = useTranslation();
+
   const stats = [
     {
-      title: "Total Earnings",
+      title: t("dashboard.totalEarnings", "Total Earnings"),
       value: "$12,847",
       change: "+18% this month",
       icon: DollarSign,
     },
-    { title: "Active Campaigns", value: "8", change: "+2 this week", icon: Users },
     {
-      title: "Conversion Rate",
+      title: t("dashboard.activeCampaigns", "Active Campaigns"),
+      value: "8",
+      change: "+2 this week",
+      icon: Users,
+    },
+    {
+      title: t("dashboard.conversionRate", "Conversion Rate"),
       value: "3.2%",
       change: "+0.4% vs last month",
       icon: TrendingUp,
     },
-    { title: "Monthly Goal", value: "85%", change: "On track", icon: Target },
+    {
+      title: t("dashboard.monthlyGoal", "Monthly Goal"),
+      value: "85%",
+      change: "On track",
+      icon: Target,
+    },
   ];
 
   const recentPayouts = [
@@ -281,15 +294,18 @@ export const AffiliateOverview = () => {
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center bg-white dark:bg-zinc-900/50 p-6 md:p-8 rounded-3xl border border-slate-200 dark:border-zinc-800 shadow-sm">
         <div>
           <h1 className="text-2xl md:text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight">
-            Affiliate Dashboard
+            {t("dashboard.affiliateDashboard", "Affiliate Dashboard")}
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 mt-2 font-medium">
-            Track your performance and maximize your on-chain earnings.
+            {t(
+              "dashboard.affiliateSubtitle",
+              "Track your performance and maximize your on-chain earnings.",
+            )}
           </p>
         </div>
         <Button className="mt-6 lg:mt-0 bg-zinc-900 hover:bg-zinc-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 text-white rounded-full px-6 h-12 font-semibold shadow-md transition-all">
           <Zap className="w-5 h-5 mr-2" />
-          Quick Start Guide
+          {t("dashboard.quickStartGuide", "Quick Start Guide")}
         </Button>
       </div>
 
@@ -333,10 +349,10 @@ export const AffiliateOverview = () => {
         <Card className="border border-slate-200 dark:border-zinc-800 shadow-sm rounded-2xl bg-white dark:bg-zinc-900/50">
           <CardHeader className="border-b border-slate-100 dark:border-zinc-800/50 pb-4">
             <CardTitle className="text-lg font-bold text-zinc-900 dark:text-white">
-              Recent Payouts
+              {t("dashboard.recentPayouts", "Recent Payouts")}
             </CardTitle>
             <CardDescription className="text-zinc-500 dark:text-zinc-400">
-              Your latest commission payments
+              {t("dashboard.recentPayoutsSubtitle", "Your latest commission payments")}
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-6">
@@ -377,7 +393,7 @@ export const AffiliateOverview = () => {
               variant="ghost"
               className="w-full mt-6 text-indigo-600 dark:text-indigo-400 font-semibold hover:bg-slate-50 dark:hover:bg-zinc-900/50"
             >
-              View All Payouts
+              {t("dashboard.viewAllPayouts", "View All Payouts")}
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </CardContent>
@@ -387,10 +403,10 @@ export const AffiliateOverview = () => {
         <Card className="border border-slate-200 dark:border-zinc-800 shadow-sm rounded-2xl bg-white dark:bg-zinc-900/50">
           <CardHeader className="border-b border-slate-100 dark:border-zinc-800/50 pb-4">
             <CardTitle className="text-lg font-bold text-zinc-900 dark:text-white">
-              Performance Tips
+              {t("dashboard.performanceTips", "Performance Tips")}
             </CardTitle>
             <CardDescription className="text-zinc-500 dark:text-zinc-400">
-              Boost your affiliate earnings
+              {t("dashboard.performanceTipsSubtitle", "Boost your affiliate earnings")}
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-6">
@@ -434,28 +450,37 @@ export const AffiliateOverview = () => {
       <Card className="border border-slate-200 dark:border-zinc-800 shadow-sm rounded-2xl bg-white dark:bg-zinc-900/50">
         <CardHeader className="border-b border-slate-100 dark:border-zinc-800/50 pb-4">
           <CardTitle className="text-lg font-bold text-zinc-900 dark:text-white">
-            Quick Actions
+            {t("dashboard.quickActions", "Quick Actions")}
           </CardTitle>
           <CardDescription className="text-zinc-500 dark:text-zinc-400">
-            Get started quickly
+            {t("dashboard.quickActionsSubtitle", "Get started quickly")}
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
               {
-                label: "Join New Campaign",
-                description: "Discover high-paying campaigns",
+                label: t("dashboard.joinNewCampaign", "Join New Campaign"),
+                description: t(
+                  "dashboard.joinNewCampaignDesc",
+                  "Discover high-paying campaigns",
+                ),
                 icon: Users,
               },
               {
-                label: "Track Performance",
-                description: "View analytics and insights",
+                label: t("dashboard.trackPerformance", "Track Performance"),
+                description: t(
+                  "dashboard.trackPerformanceDesc",
+                  "View analytics and insights",
+                ),
                 icon: TrendingUp,
               },
               {
-                label: "Withdraw Earnings",
-                description: "Claim your commissions",
+                label: t("dashboard.withdrawEarnings", "Withdraw Earnings"),
+                description: t(
+                  "dashboard.withdrawEarningsDesc",
+                  "Claim your commissions",
+                ),
                 icon: DollarSign,
               },
             ].map((action, index) => {

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import i18n, {
   SUPPORTED_LOCALES,
   RTL_LOCALES,
@@ -32,7 +32,8 @@ describe("i18n Internationalization Framework", () => {
     const supportedCodes = ["en", "es", "pt", "fr", "de", "zh", "ja", "ko", "ar", "ru"];
     supportedCodes.forEach((code) => {
       expect(resources).toHaveProperty(code);
-      expect((resources as any)[code]).toHaveProperty("translation");
+      const localeKey = code as keyof typeof resources;
+      expect(resources[localeKey]).toHaveProperty("translation");
     });
   });
 
@@ -50,14 +51,23 @@ describe("i18n Internationalization Framework", () => {
       { name: "ru", data: ru },
     ];
 
-    const expectedNamespaces = ["nav", "header", "common", "dashboard", "affiliate", "advertiser"];
+    type Namespace = keyof typeof en;
+    const expectedNamespaces: Namespace[] = [
+      "nav",
+      "header",
+      "common",
+      "dashboard",
+      "affiliate",
+      "advertiser",
+    ];
 
     localeObjects.forEach(({ name, data }) => {
       expectedNamespaces.forEach((ns) => {
         expect(data, `Locale ${name} is missing namespace: ${ns}`).toHaveProperty(ns);
+        const nsObj = data[ns];
         expect(
-          Object.keys((data as any)[ns]).length,
-          `Locale ${name} namespace ${ns} should not be empty`
+          Object.keys(nsObj).length,
+          `Locale ${name} namespace ${ns} should not be empty`,
         ).toBeGreaterThan(0);
       });
     });
@@ -105,10 +115,9 @@ describe("i18n Internationalization Framework", () => {
       },
     };
 
-    const originalDocument = (globalThis as any).document;
-    (globalThis as any).document = {
+    vi.stubGlobal("document", {
       documentElement: mockElement,
-    };
+    });
 
     try {
       updateDocumentDirection("ar");
@@ -121,7 +130,7 @@ describe("i18n Internationalization Framework", () => {
       expect(mockElement.lang).toBe("en");
       expect(mockElement.classList.contains("rtl")).toBe(false);
     } finally {
-      (globalThis as any).document = originalDocument;
+      vi.unstubAllGlobals();
     }
   });
 

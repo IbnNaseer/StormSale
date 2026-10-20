@@ -36,7 +36,25 @@
     "totalEarnings": "Общий доход",
     "activeCampaigns": "Активные кампании",
     "conversionRate": "Коэффициент конверсии",
-    "escrowBalance": "Баланс эскроу"
+    "escrowBalance": "Баланс эскроу",
+    "affiliateDashboard": "Панель партнера",
+    "affiliateSubtitle": "Отслеживайте результаты и максимизируйте доход на блокчейне.",
+    "quickStartGuide": "Руководство по быстрому старту",
+    "activeReferrals": "Активные рефералы",
+    "monthlyGoal": "Ежемесячная цель",
+    "recentPayouts": "Недавние выплаты",
+    "recentPayoutsSubtitle": "Ваши последние выплаты комиссионных",
+    "viewAllPayouts": "Посмотреть все выплаты",
+    "performanceTips": "Советы по повышению эффективности",
+    "performanceTipsSubtitle": "Увеличьте свой партнерский доход",
+    "quickActions": "Быстрые действия",
+    "quickActionsSubtitle": "Быстрый старт",
+    "joinNewCampaign": "Присоединиться к кампании",
+    "joinNewCampaignDesc": "Откройте для себя высокооплачиваемые кампании",
+    "trackPerformance": "Отслеживать эффективность",
+    "trackPerformanceDesc": "Просмотр аналитики и статистики",
+    "withdrawEarnings": "Вывести доход",
+    "withdrawEarningsDesc": "Получите свои комиссионные"
   },
   "affiliate": {
     "title": "Партнерский портал",
@@ -44,7 +62,15 @@
     "commissionRate": "Ставка комиссии",
     "payouts": "Выплаты",
     "myLinks": "Мои реферальные ссылки",
-    "generateLink": "Создать ссылку"
+    "generateLink": "Создать ссылку",
+    "roleName": "Партнер Pro",
+    "dashboardOverview": "Обзор панели",
+    "telegramCampaigns": "Кампании в Telegram",
+    "joinCampaign": "Присоединиться к кампании",
+    "mySales": "Мои продажи и комиссии",
+    "claimPayouts": "Запросить выплаты",
+    "personalizedSettings": "Персональные настройки",
+    "securityKeys": "Безопасность и ключи"
   },
   "advertiser": {
     "title": "Портал рекламодателя",

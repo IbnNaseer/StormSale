@@ -36,7 +36,25 @@
     "totalEarnings": "总收益",
     "activeCampaigns": "进行中活动",
     "conversionRate": "转化率",
-    "escrowBalance": "托管余额"
+    "escrowBalance": "托管余额",
+    "affiliateDashboard": "推广联盟仪表板",
+    "affiliateSubtitle": "追踪您的表现，最大化链上收益。",
+    "quickStartGuide": "快速入门指南",
+    "activeReferrals": "活跃推荐",
+    "monthlyGoal": "月度目标",
+    "recentPayouts": "近期付款",
+    "recentPayoutsSubtitle": "您最新的佣金支付记录",
+    "viewAllPayouts": "查看所有付款",
+    "performanceTips": "表现提升建议",
+    "performanceTipsSubtitle": "提高您的联盟推广收益",
+    "quickActions": "快捷操作",
+    "quickActionsSubtitle": "快速开始",
+    "joinNewCampaign": "加入新活动",
+    "joinNewCampaignDesc": "发现高报酬推广活动",
+    "trackPerformance": "追踪表现",
+    "trackPerformanceDesc": "查看数据分析与洞察",
+    "withdrawEarnings": "提取收益",
+    "withdrawEarningsDesc": "领取您的推广佣金"
   },
   "affiliate": {
     "title": "联盟推广中心",
@@ -44,7 +62,15 @@
     "commissionRate": "佣金比例",
     "payouts": "提现记录",
     "myLinks": "我的推广链接",
-    "generateLink": "生成链接"
+    "generateLink": "生成链接",
+    "roleName": "专业联盟客",
+    "dashboardOverview": "仪表板概览",
+    "telegramCampaigns": "Telegram 活动",
+    "joinCampaign": "加入活动",
+    "mySales": "我的销售与佣金",
+    "claimPayouts": "领取付款",
+    "personalizedSettings": "个性化设置",
+    "securityKeys": "安全与密钥"
   },
   "advertiser": {
     "title": "广告主中心",

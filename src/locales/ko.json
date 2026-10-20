@@ -36,7 +36,25 @@
     "totalEarnings": "총 수익",
     "activeCampaigns": "진행 중인 캠페인",
     "conversionRate": "전환율",
-    "escrowBalance": "에스크로 잔액"
+    "escrowBalance": "에스크로 잔액",
+    "affiliateDashboard": "제휴 대시보드",
+    "affiliateSubtitle": "실적을 추적하고 온체인 수익을 극대화하세요.",
+    "quickStartGuide": "빠른 시작 가이드",
+    "activeReferrals": "활성 추천인",
+    "monthlyGoal": "월간 목표",
+    "recentPayouts": "최근 지급 내역",
+    "recentPayoutsSubtitle": "최신 수수료 지급 기록",
+    "viewAllPayouts": "모든 지급 내역 보기",
+    "performanceTips": "실적 향상 팁",
+    "performanceTipsSubtitle": "제휴 수익 증대하기",
+    "quickActions": "빠른 작업",
+    "quickActionsSubtitle": "빠르게 시작하기",
+    "joinNewCampaign": "새 캠페인 참여",
+    "joinNewCampaignDesc": "고수익 캠페인 찾기",
+    "trackPerformance": "실적 추적",
+    "trackPerformanceDesc": "분석 및 통계 보기",
+    "withdrawEarnings": "수익 인출",
+    "withdrawEarningsDesc": "수수료 청구하기"
   },
   "affiliate": {
     "title": "제휴 포털",
@@ -44,7 +62,15 @@
     "commissionRate": "수수료율",
     "payouts": "지급 내역",
     "myLinks": "내 추적 링크",
-    "generateLink": "링크 생성"
+    "generateLink": "링크 생성",
+    "roleName": "제휴 프로",
+    "dashboardOverview": "대시보드 개요",
+    "telegramCampaigns": "텔레그램 캠페인",
+    "joinCampaign": "캠페인 참여",
+    "mySales": "내 매출 및 수수료",
+    "claimPayouts": "지급금 청구",
+    "personalizedSettings": "맞춤 설정",
+    "securityKeys": "보안 및 키"
   },
   "advertiser": {
     "title": "광고주 포털",

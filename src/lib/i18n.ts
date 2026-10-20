@@ -36,12 +36,25 @@ export const SUPPORTED_LOCALES: LocaleMeta[] = [
 
 export const RTL_LOCALES = ["ar", "he"];
 
+/**
+ * Determines whether a given locale string corresponds to a Right-to-Left (RTL) script.
+ * Supports language subtag strings (e.g., 'ar', 'ar-SA', 'he').
+ *
+ * @param locale - BCP-47 or ISO language tag to test
+ * @returns True if the locale is an RTL language, false otherwise
+ */
 export function isRTL(locale: string): boolean {
   if (!locale) return false;
   const baseLocale = locale.toLowerCase().split("-")[0];
   return RTL_LOCALES.includes(baseLocale);
 }
 
+/**
+ * Updates the HTML document root direction ('dir' attribute), language ('lang' attribute),
+ * and dynamic 'rtl' class to adapt the layout for RTL or LTR presentation.
+ *
+ * @param locale - Active language code (e.g. 'ar', 'en', 'es')
+ */
 export function updateDocumentDirection(locale: string) {
   if (typeof document !== "undefined") {
     const rtl = isRTL(locale);

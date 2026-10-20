@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Sidebar } from "../components/shared/Sidebar";
 import { ThemeToggle } from "../components/shared/ThemeToggle";
@@ -17,6 +16,7 @@ import {
   Sliders,
 } from "lucide-react";
 import { NotificationProvider } from "../context/NotificationContext";
+import { usePreference } from "../hooks/usePreference";
 import { motion, AnimatePresence } from "framer-motion";
 import { isTelegramMiniApp } from "../lib/telegram";
 import { AffiliateSettings } from "../components/affiliate/AffiliateSettings";
@@ -27,10 +27,23 @@ interface AffiliateProps {
   onBack: () => void;
 }
 
+const AFFILIATE_TABS = [
+  "overview",
+  "telegram-browser",
+  "join-campaign",
+  "my-sales",
+  "claim-payouts",
+  "settings",
+  "security",
+] as const;
+type AffiliateTab = (typeof AFFILIATE_TABS)[number];
+
 const AffiliateContent: React.FC<AffiliateProps> = ({ onBack }) => {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState(() =>
+  const [activeTab, setActiveTab] = usePreference<AffiliateTab>(
+    "stormsale.affiliate.tab",
     isTelegramMiniApp() ? "telegram-browser" : "overview",
+    (v) => AFFILIATE_TABS.includes(v as AffiliateTab),
   );
 
   const tabs = [
@@ -94,7 +107,7 @@ const AffiliateContent: React.FC<AffiliateProps> = ({ onBack }) => {
     <div className="flex flex-col lg:flex-row min-h-screen bg-slate-50 dark:bg-zinc-950 font-sans selection:bg-indigo-500/30">
       <Sidebar
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={(tab) => setActiveTab(tab as AffiliateTab)}
         tabs={tabs}
         onBack={onBack}
         roleName={t("affiliate.roleName", "Affiliate Pro")}

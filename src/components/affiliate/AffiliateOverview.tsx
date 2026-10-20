@@ -52,6 +52,7 @@ async function createEncryptedAffiliateUrl(affiliate: string, campaignId: string
 
 const AffiliateLinkGenerator = () => {
   const { userAddress } = useWeb3();
+  const { t } = useTranslation();
   const [campaignId, setCampaignId] = useState("");
   const [affiliateOverride, setAffiliateOverride] = useState<string | null>(null);
   const affiliateAddress = affiliateOverride ?? userAddress ?? "";
@@ -65,7 +66,7 @@ const AffiliateLinkGenerator = () => {
     setShareUrl("");
     setQrDataUrl("");
     if (!affiliateAddress.trim() || !campaignId.trim()) {
-      setMessage("Enter an affiliate wallet and campaign ID to create a link.");
+      setMessage(t("dashboard.enterAffiliateWallet", "Enter an affiliate wallet and campaign ID to create a link."));
       return;
     }
     setIsGenerating(true);
@@ -79,20 +80,20 @@ const AffiliateLinkGenerator = () => {
       });
       setShareUrl(nextUrl);
       setQrDataUrl(qr);
-      setMessage("Encrypted link and QR code are ready.");
+      setMessage(t("dashboard.linkReady", "Encrypted link and QR code are ready."));
     } catch {
-      setMessage("Could not create your link. Use a secure (HTTPS) connection and try again.");
+      setMessage(t("dashboard.linkError", "Could not create your link. Use a secure (HTTPS) connection and try again."));
     } finally {
       setIsGenerating(false);
     }
-  }, [affiliateAddress, campaignId]);
+  }, [affiliateAddress, campaignId, t]);
 
   const copyLink = async () => {
     try {
       await navigator.clipboard.writeText(shareUrl);
-      setMessage("Link copied to clipboard.");
+      setMessage(t("dashboard.linkCopied", "Link copied to clipboard."));
     } catch {
-      setMessage("Clipboard access is unavailable. Select and copy the link below.");
+      setMessage(t("dashboard.linkCopyUnavailable", "Clipboard access is unavailable. Select and copy the link below."));
     }
   };
 
@@ -105,10 +106,10 @@ const AffiliateLinkGenerator = () => {
           </div>
           <div>
             <CardTitle className="text-lg font-bold text-zinc-900 dark:text-white">
-              Encrypted link & QR code
+              {t("dashboard.encryptedLinkTitle", "Encrypted link & QR code")}
             </CardTitle>
             <CardDescription className="mt-1 text-zinc-500 dark:text-zinc-400">
-              Create a private, campaign-specific tracking link to share anywhere.
+              {t("dashboard.encryptedLinkDescription", "Create a private, campaign-specific tracking link to share anywhere.")}
             </CardDescription>
           </div>
         </div>
@@ -121,14 +122,14 @@ const AffiliateLinkGenerator = () => {
                 htmlFor="affiliate-wallet"
                 className="mb-1.5 block text-xs font-semibold text-zinc-600 dark:text-zinc-300"
               >
-                Affiliate wallet
+                {t("dashboard.affiliateWallet", "Affiliate wallet")}
               </label>
               <input
                 id="affiliate-wallet"
                 value={affiliateAddress}
                 onChange={(event) => setAffiliateOverride(event.target.value)}
-                placeholder="G... wallet address"
-                className="w-full h-11 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-3.5 text-sm text-zinc-900 dark:text-white outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15"
+                placeholder={t("dashboard.walletPlaceholder", "G... wallet address")}
+                className="w-full h-11 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-3.5 text-sm text-zinc-900 dark:text-white outline-none focus:border-indigo-500 dark:focus:border-indigo-400"
               />
             </div>
             <div>
@@ -136,14 +137,14 @@ const AffiliateLinkGenerator = () => {
                 htmlFor="campaign-id"
                 className="mb-1.5 block text-xs font-semibold text-zinc-600 dark:text-zinc-300"
               >
-                Campaign ID
+                {t("dashboard.campaignId", "Campaign ID")}
               </label>
               <input
                 id="campaign-id"
                 value={campaignId}
                 onChange={(event) => setCampaignId(event.target.value)}
-                placeholder="e.g. spring-launch"
-                className="w-full h-11 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-3.5 text-sm text-zinc-900 dark:text-white outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15"
+                placeholder={t("dashboard.campaignIdPlaceholder", "e.g. spring-launch")}
+                className="w-full h-11 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-3.5 text-sm text-zinc-900 dark:text-white outline-none focus:border-indigo-500 dark:focus:border-indigo-400"
               />
             </div>
             <Button
@@ -153,10 +154,10 @@ const AffiliateLinkGenerator = () => {
             >
               <QrCode className="mr-2 h-4 w-4" />
               {isGenerating
-                ? "Generating secure link…"
+                ? t("dashboard.generatingLink", "Generating secure link…")
                 : shareUrl
-                  ? "Generate a new link"
-                  : "Generate link & QR code"}
+                  ? t("dashboard.generateNewLink", "Generate a new link")
+                  : t("dashboard.generateLink", "Generate link & QR code")}
             </Button>
             {message && (
               <p
@@ -173,7 +174,7 @@ const AffiliateLinkGenerator = () => {
                   htmlFor="share-link"
                   className="block text-xs font-semibold text-zinc-600 dark:text-zinc-300"
                 >
-                  Your share link
+                  {t("dashboard.shareLink", "Your share link")}
                 </label>
                 <div className="flex gap-2">
                   <input
@@ -185,7 +186,7 @@ const AffiliateLinkGenerator = () => {
                   <Button
                     variant="outline"
                     onClick={copyLink}
-                    aria-label="Copy affiliate link"
+                    aria-label={t("dashboard.copyAffiliateLink", "Copy affiliate link")}
                     className="h-10 rounded-lg px-3"
                   >
                     <Copy className="h-4 w-4" />
@@ -196,8 +197,10 @@ const AffiliateLinkGenerator = () => {
             <div className="flex gap-2 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 p-3 text-xs leading-relaxed text-emerald-800 dark:text-emerald-300">
               <ShieldCheck className="h-4 w-4 shrink-0" />
               <span>
-                AES-256-GCM encrypts your affiliate and campaign details. The key stays in the URL
-                fragment and is not sent with the request.
+                {t(
+                  "dashboard.securityNote",
+                  "AES-256-GCM encrypts your affiliate and campaign details. The key stays in the URL fragment and is not sent with the request.",
+                )}
               </span>
             </div>
           </div>
@@ -206,18 +209,18 @@ const AffiliateLinkGenerator = () => {
               <>
                 <img
                   src={qrDataUrl}
-                  alt="QR code for encrypted affiliate tracking link"
+                  alt={t("dashboard.qrCodeAlt", "QR code for encrypted affiliate tracking link")}
                   className="h-[180px] w-[180px] rounded-xl bg-white p-2 shadow-sm"
                 />
                 <p className="mt-3 text-xs font-medium text-zinc-600 dark:text-zinc-300">
-                  Scan to open your affiliate link
+                  {t("dashboard.scanQr", "Scan to open your affiliate link")}
                 </p>
                 <a
                   href={qrDataUrl}
                   download="stormsale-affiliate-qr.png"
-                  className="mt-3 inline-flex h-9 items-center gap-2 rounded-lg border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 text-xs font-semibold text-zinc-700 dark:text-zinc-200 hover:border-indigo-400"
+                  className="mt-3 inline-flex h-9 items-center gap-2 rounded-lg border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 text-xs font-semibold text-zinc-700 dark:text-zinc-200"
                 >
-                  <Download className="h-3.5 w-3.5" /> Download QR
+                  <Download className="h-3.5 w-3.5" /> {t("dashboard.downloadQr", "Download QR")}
                 </a>
               </>
             ) : (
@@ -226,7 +229,7 @@ const AffiliateLinkGenerator = () => {
                   <QrCode className="h-16 w-16" strokeWidth={1.25} />
                 </div>
                 <p className="mt-3 text-xs text-zinc-500 dark:text-zinc-400">
-                  Your QR code appears here
+                  {t("dashboard.qrCodePlaceholder", "Your QR code appears here")}
                 </p>
               </>
             )}
@@ -244,25 +247,25 @@ export const AffiliateOverview = () => {
     {
       title: t("dashboard.totalEarnings", "Total Earnings"),
       value: "$12,847",
-      change: "+18% this month",
+      change: t("dashboard.totalEarningsChange", "+18% this month"),
       icon: DollarSign,
     },
     {
       title: t("dashboard.activeCampaigns", "Active Campaigns"),
       value: "8",
-      change: "+2 this week",
+      change: t("dashboard.activeCampaignsChange", "+2 this week"),
       icon: Users,
     },
     {
       title: t("dashboard.conversionRate", "Conversion Rate"),
       value: "3.2%",
-      change: "+0.4% vs last month",
+      change: t("dashboard.conversionRateChange", "+0.4% vs last month"),
       icon: TrendingUp,
     },
     {
       title: t("dashboard.monthlyGoal", "Monthly Goal"),
       value: "85%",
-      change: "On track",
+      change: t("dashboard.monthlyGoalChange", "On track"),
       icon: Target,
     },
   ];
@@ -290,7 +293,6 @@ export const AffiliateOverview = () => {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center bg-white dark:bg-zinc-900/50 p-6 md:p-8 rounded-3xl border border-slate-200 dark:border-zinc-800 shadow-sm">
         <div>
           <h1 className="text-2xl md:text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight">
@@ -309,7 +311,6 @@ export const AffiliateOverview = () => {
         </Button>
       </div>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, index) => {
           const IconComponent = stat.icon;
@@ -343,9 +344,7 @@ export const AffiliateOverview = () => {
 
       <AffiliateLinkGenerator />
 
-      {/* Two Column Layout */}
       <div className="grid lg:grid-cols-2 gap-8">
-        {/* Recent Payouts */}
         <Card className="border border-slate-200 dark:border-zinc-800 shadow-sm rounded-2xl bg-white dark:bg-zinc-900/50">
           <CardHeader className="border-b border-slate-100 dark:border-zinc-800/50 pb-4">
             <CardTitle className="text-lg font-bold text-zinc-900 dark:text-white">
@@ -360,25 +359,19 @@ export const AffiliateOverview = () => {
               {recentPayouts.map((payout, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-4 bg-slate-50 dark:bg-zinc-950/50 border border-slate-100 dark:border-zinc-800/50 rounded-xl hover:border-slate-200 dark:hover:border-zinc-700 transition-colors"
+                  className="flex items-center justify-between p-4 bg-slate-50 dark:bg-zinc-950/50 border border-slate-100 dark:border-zinc-800/50 rounded-xl hover:border-slate-200 dark:hover:border-zinc-700"
                 >
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 rounded-xl flex items-center justify-center shrink-0">
                       <DollarSign className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                     </div>
                     <div>
-                      <div className="font-bold text-sm text-zinc-900 dark:text-white">
-                        {payout.campaign}
-                      </div>
-                      <div className="text-xs font-medium text-zinc-400 dark:text-zinc-500 mt-0.5">
-                        {payout.date}
-                      </div>
+                      <div className="font-bold text-sm text-zinc-900 dark:text-white">{payout.campaign}</div>
+                      <div className="text-xs font-medium text-zinc-400 dark:text-zinc-500 mt-0.5">{payout.date}</div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="font-bold text-sm text-zinc-900 dark:text-white">
-                      {payout.amount}
-                    </div>
+                    <div className="font-bold text-sm text-zinc-900 dark:text-white">{payout.amount}</div>
                     <div className="flex items-center justify-end gap-1 mt-1">
                       <CheckCircle2 className="w-3 h-3 text-emerald-500" />
                       <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">
@@ -399,7 +392,6 @@ export const AffiliateOverview = () => {
           </CardContent>
         </Card>
 
-        {/* Performance Tips */}
         <Card className="border border-slate-200 dark:border-zinc-800 shadow-sm rounded-2xl bg-white dark:bg-zinc-900/50">
           <CardHeader className="border-b border-slate-100 dark:border-zinc-800/50 pb-4">
             <CardTitle className="text-lg font-bold text-zinc-900 dark:text-white">
@@ -413,26 +405,24 @@ export const AffiliateOverview = () => {
             <div className="space-y-4">
               {[
                 {
-                  tip: "Optimize your content for higher conversions",
-                  impact: "High",
+                  tip: t("dashboard.tipOptimize", "Optimize your content for higher conversions"),
+                  impact: t("dashboard.tipHigh", "High"),
                 },
-                { tip: "Join trending campaigns early", impact: "Medium" },
-                { tip: "Use multiple promotion channels", impact: "High" },
+                { tip: t("dashboard.tipTrending", "Join trending campaigns early"), impact: t("dashboard.tipMedium", "Medium") },
+                { tip: t("dashboard.tipChannels", "Use multiple promotion channels"), impact: t("dashboard.tipHigh", "High") },
                 {
-                  tip: "Engage with your audience regularly",
-                  impact: "Medium",
+                  tip: t("dashboard.tipAudience", "Engage with your audience regularly"),
+                  impact: t("dashboard.tipMedium", "Medium"),
                 },
               ].map((item, index) => (
                 <div
                   key={index}
                   className="flex items-center justify-between p-4 bg-slate-50 dark:bg-zinc-950/50 border border-slate-100 dark:border-zinc-800/50 rounded-xl"
                 >
-                  <div className="text-sm font-medium text-zinc-700 dark:text-zinc-300 pr-4">
-                    {item.tip}
-                  </div>
+                  <div className="text-sm font-medium text-zinc-700 dark:text-zinc-300 pr-4">{item.tip}</div>
                   <span
                     className={`shrink-0 text-[10px] uppercase tracking-wider font-bold px-3 py-1 rounded-full ${
-                      item.impact === "High"
+                      item.impact === t("dashboard.tipHigh", "High")
                         ? "bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400"
                         : "bg-slate-200 text-slate-600 dark:bg-zinc-800 dark:text-zinc-400"
                     }`}
@@ -446,7 +436,6 @@ export const AffiliateOverview = () => {
         </Card>
       </div>
 
-      {/* Quick Actions */}
       <Card className="border border-slate-200 dark:border-zinc-800 shadow-sm rounded-2xl bg-white dark:bg-zinc-900/50">
         <CardHeader className="border-b border-slate-100 dark:border-zinc-800/50 pb-4">
           <CardTitle className="text-lg font-bold text-zinc-900 dark:text-white">
@@ -461,26 +450,17 @@ export const AffiliateOverview = () => {
             {[
               {
                 label: t("dashboard.joinNewCampaign", "Join New Campaign"),
-                description: t(
-                  "dashboard.joinNewCampaignDesc",
-                  "Discover high-paying campaigns",
-                ),
+                description: t("dashboard.joinNewCampaignDesc", "Discover high-paying campaigns"),
                 icon: Users,
               },
               {
                 label: t("dashboard.trackPerformance", "Track Performance"),
-                description: t(
-                  "dashboard.trackPerformanceDesc",
-                  "View analytics and insights",
-                ),
+                description: t("dashboard.trackPerformanceDesc", "View analytics and insights"),
                 icon: TrendingUp,
               },
               {
                 label: t("dashboard.withdrawEarnings", "Withdraw Earnings"),
-                description: t(
-                  "dashboard.withdrawEarningsDesc",
-                  "Claim your commissions",
-                ),
+                description: t("dashboard.withdrawEarningsDesc", "Claim your commissions"),
                 icon: DollarSign,
               },
             ].map((action, index) => {
@@ -489,13 +469,11 @@ export const AffiliateOverview = () => {
                 <Button
                   key={index}
                   variant="outline"
-                  className="h-24 flex-col gap-3 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 hover:border-slate-300 dark:hover:border-zinc-700 transition-all group"
+                  className="h-24 flex-col gap-3 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 hover:border-slate-300 dark:hover:border-zinc-700"
                 >
                   <IconComponent className="w-6 h-6 text-zinc-400 dark:text-zinc-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors" />
                   <div className="text-center">
-                    <div className="text-sm font-bold text-zinc-700 dark:text-zinc-300">
-                      {action.label}
-                    </div>
+                    <div className="text-sm font-bold text-zinc-700 dark:text-zinc-300">{action.label}</div>
                     <div className="text-[10px] font-medium text-zinc-400 dark:text-zinc-500 mt-0.5">
                       {action.description}
                     </div>

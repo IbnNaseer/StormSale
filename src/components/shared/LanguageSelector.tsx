@@ -33,16 +33,26 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const optionRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  // Normalize current locale
   const currentLang = i18n.language ? i18n.language.split("-")[0] : "en";
   const currentLocale: LocaleMeta =
-    SUPPORTED_LOCALES.find((l) => l.code === currentLang) || SUPPORTED_LOCALES[0];
+    SUPPORTED_LOCALES.find((locale) => locale.code === currentLang) || SUPPORTED_LOCALES[0];
+  const selectedIndex = SUPPORTED_LOCALES.findIndex((locale) => locale.code === currentLang);
 
-  const selectedIndex = SUPPORTED_LOCALES.findIndex((l) => l.code === currentLang);
+  const focusOption = useCallback((index: number) => {
+    setFocusedIndex(index);
+    const focus = () => optionRefs.current[index]?.focus();
+
+    if (typeof window !== "undefined" && "requestAnimationFrame" in window) {
+      window.requestAnimationFrame(focus);
+      return;
+    }
+
+    focus();
+  }, []);
 
   const handleSelectLanguage = useCallback(
     (code: string) => {
-      i18n.changeLanguage(code);
+      void i18n.changeLanguage(code);
       updateDocumentDirection(code);
       setIsOpen(false);
       triggerRef.current?.focus();
@@ -50,22 +60,16 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
     [i18n],
   );
 
-  // Focus management when dropdown opens or active focused option changes
   useEffect(() => {
-    if (isOpen) {
-      const initialIndex = selectedIndex >= 0 ? selectedIndex : 0;
-      setFocusedIndex(initialIndex);
-      // Wait for DOM paint then focus active option
-      const timer = setTimeout(() => {
-        optionRefs.current[initialIndex]?.focus();
-      }, 10);
-      return () => clearTimeout(timer);
-    } else {
+    if (!isOpen) {
       setFocusedIndex(-1);
+      return;
     }
-  }, [isOpen, selectedIndex]);
 
-  // Click outside handling
+    const initialIndex = selectedIndex >= 0 ? selectedIndex : 0;
+    focusOption(initialIndex);
+  }, [focusOption, isOpen, selectedIndex]);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -82,56 +86,56 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
     };
   }, [isOpen]);
 
-  // Keyboard navigation adhering to W3C ARIA Listbox pattern
-  const handleListboxKeyDown = (e: React.KeyboardEvent) => {
-    switch (e.key) {
+  const handleOptionKeyDown = (event: React.KeyboardEvent, index: number) => {
+    const total = SUPPORTED_LOCALES.length;
+
+    switch (event.key) {
       case "ArrowDown": {
-        e.preventDefault();
-        const nextIndex = (focusedIndex + 1) % SUPPORTED_LOCALES.length;
-        setFocusedIndex(nextIndex);
-        optionRefs.current[nextIndex]?.focus();
+        event.preventDefault();
+        const nextIndex = (index + 1) % total;
+        focusOption(nextIndex);
         break;
       }
       case "ArrowUp": {
-        e.preventDefault();
-        const prevIndex = (focusedIndex - 1 + SUPPORTED_LOCALES.length) % SUPPORTED_LOCALES.length;
-        setFocusedIndex(prevIndex);
-        optionRefs.current[prevIndex]?.focus();
+        event.preventDefault();
+        const previousIndex = (index - 1 + total) % total;
+        focusOption(previousIndex);
         break;
       }
       case "Home": {
-        e.preventDefault();
-        setFocusedIndex(0);
-        optionRefs.current[0]?.focus();
+        event.preventDefault();
+        focusOption(0);
         break;
       }
       case "End": {
-        e.preventDefault();
-        const lastIndex = SUPPORTED_LOCALES.length - 1;
-        setFocusedIndex(lastIndex);
-        optionRefs.current[lastIndex]?.focus();
+        event.preventDefault();
+        focusOption(total - 1);
         break;
       }
       case "Escape": {
-        e.preventDefault();
+        event.preventDefault();
         setIsOpen(false);
         triggerRef.current?.focus();
         break;
       }
       case "Enter":
       case " ": {
-        e.preventDefault();
-        if (focusedIndex >= 0 && focusedIndex < SUPPORTED_LOCALES.length) {
-          handleSelectLanguage(SUPPORTED_LOCALES[focusedIndex].code);
-        }
+        event.preventDefault();
+        handleSelectLanguage(SUPPORTED_LOCALES[index].code);
         break;
       }
     }
   };
 
-  const handleTriggerKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
+  const handleListboxKeyDown = (event: React.KeyboardEvent) => {
+    if (focusedIndex >= 0) {
+      handleOptionKeyDown(event, focusedIndex);
+    }
+  };
+
+  const handleTriggerKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === "ArrowDown" || event.key === "ArrowUp" || event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
       setIsOpen(true);
     }
   };
@@ -141,7 +145,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
       <button
         ref={triggerRef}
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => setIsOpen((open) => !open)}
         onKeyDown={handleTriggerKeyDown}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
@@ -184,17 +188,18 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
           </div>
 
           <div className="py-1">
-            {SUPPORTED_LOCALES.map((locale, idx) => {
+            {SUPPORTED_LOCALES.map((locale, index) => {
               const isSelected = locale.code === currentLang;
               return (
                 <button
                   key={locale.code}
-                  ref={(el) => {
-                    optionRefs.current[idx] = el;
+                  ref={(element) => {
+                    optionRefs.current[index] = element;
                   }}
                   role="option"
-                  tabIndex={focusedIndex === idx ? 0 : -1}
+                  tabIndex={focusedIndex === index ? 0 : -1}
                   aria-selected={isSelected}
+                  onKeyDown={(event) => handleOptionKeyDown(event, index)}
                   onClick={() => handleSelectLanguage(locale.code)}
                   className={`w-full px-3 py-2 text-left text-xs flex items-center justify-between transition-colors focus:outline-none ${
                     isSelected
@@ -231,3 +236,5 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
     </div>
   );
 };
+
+export default LanguageSelector;

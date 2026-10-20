@@ -15,6 +15,7 @@ import {
   Plus,
   Trash2,
   UploadCloud,
+  XCircle,
 } from "lucide-react";
 import {
   executeBatchSaleLogging,
@@ -29,39 +30,54 @@ import { useNotification } from "../../context/NotificationContext";
 import { STELLAR_CONFIG } from "../../config/stellar";
 import { StrKey, Keypair } from "@stellar/stellar-sdk";
 
-interface BulkSaleLogModalProps {
+export interface BulkSaleLogModalProps {
   onClose?: () => void;
   defaultCampaignId?: number;
+  initialSalesList?: SaleItem[];
+  initialReceipt?: BatchSaleSummaryReceipt | null;
+  initialProgress?: BatchExecutionProgress | null;
+}
+
+/**
+ * Strict decimal validator for XLM amounts:
+ * Requires a positive decimal number with at most 7 fractional digits.
+ * Rejects trailing garbage, empty input, non-numeric strings, and scientific notation.
+ */
+export function isValidXlmAmount(val: string): { valid: boolean; amount?: number; error?: string } {
+  const trimmed = val.trim();
+  if (!trimmed) {
+    return { valid: false, error: "Please enter a positive XLM sale amount." };
+  }
+  // Strict decimal format: positive number without exponents, up to 7 decimal places
+  if (!/^(0|[1-9]\d*)(\.\d+)?$/.test(trimmed)) {
+    return {
+      valid: false,
+      error: "Amount must be a valid positive decimal number without scientific notation.",
+    };
+  }
+  const decimalPart = trimmed.includes(".") ? trimmed.split(".")[1] : "";
+  if (decimalPart.length > 7) {
+    return { valid: false, error: "Stellar amounts support a maximum of 7 decimal places." };
+  }
+  const amount = parseFloat(trimmed);
+  if (isNaN(amount) || amount <= 0) {
+    return { valid: false, error: "Please enter a positive XLM sale amount." };
+  }
+  return { valid: true, amount };
 }
 
 export const BulkSaleLogModal: React.FC<BulkSaleLogModalProps> = ({
   onClose: _onClose,
   defaultCampaignId = 101,
+  initialSalesList,
+  initialReceipt = null,
+  initialProgress = null,
 }) => {
   const { userAddress, connectorType } = useWeb3();
   const { showNotification } = useNotification();
 
-  // Generate initial valid sample items
-  const [salesList, setSalesList] = useState<SaleItem[]>(() => {
-    const kp1 = Keypair.random().publicKey();
-    const kp2 = Keypair.random().publicKey();
-    return [
-      {
-        id: "SALE_001",
-        campaignId: defaultCampaignId,
-        affiliateAddress: kp1,
-        saleAmountXlm: 25.5,
-        customerRef: "CUST_ALICE_01",
-      },
-      {
-        id: "SALE_002",
-        campaignId: defaultCampaignId,
-        affiliateAddress: kp2,
-        saleAmountXlm: 40.0,
-        customerRef: "CUST_BOB_02",
-      },
-    ];
-  });
+  // Initialize with empty array unless initialSalesList is provided; test templates are only rendered in DEV mode
+  const [salesList, setSalesList] = useState<SaleItem[]>(initialSalesList ?? []);
 
   // Real sale entry fields
   const [newAffiliate, setNewAffiliate] = useState("");
@@ -71,8 +87,8 @@ export const BulkSaleLogModal: React.FC<BulkSaleLogModalProps> = ({
   const [csvText, setCsvText] = useState("");
 
   const [isProcessing, setIsProcessing] = useState(false);
-  const [progress, setProgress] = useState<BatchExecutionProgress | null>(null);
-  const [receipt, setReceipt] = useState<BatchSaleSummaryReceipt | null>(null);
+  const [progress, setProgress] = useState<BatchExecutionProgress | null>(initialProgress);
+  const [receipt, setReceipt] = useState<BatchSaleSummaryReceipt | null>(initialReceipt);
   const [copiedHash, setCopiedHash] = useState<string | null>(null);
 
   // Add individual real sale
@@ -97,22 +113,12 @@ export const BulkSaleLogModal: React.FC<BulkSaleLogModalProps> = ({
       return;
     }
 
-    const parsedAmount = parseFloat(newAmount);
-    if (isNaN(parsedAmount) || parsedAmount <= 0) {
+    const amtValidation = isValidXlmAmount(newAmount);
+    if (!amtValidation.valid || amtValidation.amount === undefined) {
       showNotification({
         type: "warning",
         title: "Invalid Amount",
-        message: "Please enter a positive XLM sale amount.",
-      });
-      return;
-    }
-
-    const decimalPart = newAmount.includes(".") ? newAmount.split(".")[1] : "";
-    if (decimalPart.length > 7) {
-      showNotification({
-        type: "warning",
-        title: "Excessive Precision",
-        message: "Stellar amounts support a maximum of 7 decimal places.",
+        message: amtValidation.error || "Please enter a positive XLM sale amount.",
       });
       return;
     }
@@ -121,7 +127,7 @@ export const BulkSaleLogModal: React.FC<BulkSaleLogModalProps> = ({
       id: `SALE_${Date.now().toString().slice(-6)}`,
       campaignId: defaultCampaignId,
       affiliateAddress: trimmedAffiliate,
-      saleAmountXlm: parsedAmount,
+      saleAmountXlm: amtValidation.amount,
       customerRef: newRef.trim() || `ORDER_${Date.now().toString().slice(-4)}`,
     };
 
@@ -140,23 +146,38 @@ export const BulkSaleLogModal: React.FC<BulkSaleLogModalProps> = ({
     const errors: string[] = [];
 
     lines.forEach((line, index) => {
-      const parts = line.split(",").map((p) => p.trim());
+      const trimmedLine = line.trim();
+      if (!trimmedLine) return;
+
+      // Skip header row if present on line 1
+      if (index === 0) {
+        const lower = trimmedLine.toLowerCase();
+        if (
+          lower.includes("affiliate") ||
+          lower.includes("address") ||
+          lower.includes("amount")
+        ) {
+          return;
+        }
+      }
+
+      const parts = trimmedLine.split(",").map((p) => p.trim());
       if (parts.length < 2) return;
       const [affAddr, amtStr, custRef] = parts;
       if (!StrKey.isValidEd25519PublicKey(affAddr)) {
         errors.push(`Row ${index + 1}: Invalid public key (${affAddr})`);
         return;
       }
-      const amt = parseFloat(amtStr);
-      if (isNaN(amt) || amt <= 0) {
-        errors.push(`Row ${index + 1}: Invalid amount (${amtStr})`);
+      const amtValidation = isValidXlmAmount(amtStr);
+      if (!amtValidation.valid || amtValidation.amount === undefined) {
+        errors.push(`Row ${index + 1}: ${amtValidation.error || "Invalid amount"} (${amtStr})`);
         return;
       }
       imported.push({
         id: `CSV_${Date.now().toString().slice(-4)}_${index + 1}`,
         campaignId: defaultCampaignId,
         affiliateAddress: affAddr,
-        saleAmountXlm: amt,
+        saleAmountXlm: amtValidation.amount,
         customerRef: custRef || `ORDER_${index + 1}`,
       });
     });
@@ -253,17 +274,40 @@ export const BulkSaleLogModal: React.FC<BulkSaleLogModalProps> = ({
 
       setReceipt(finalReceipt);
 
-      if (finalReceipt.success) {
+      // Remove confirmed sales from salesList using confirmed sale IDs in itemizedResults
+      const confirmedIds = new Set(
+        finalReceipt.itemizedResults
+          .filter((item) => item.status === "confirmed")
+          .map((item) => item.saleId),
+      );
+      if (confirmedIds.size > 0) {
+        setSalesList((prev) => prev.filter((s) => !confirmedIds.has(s.id)));
+      }
+
+      const receiptState: "ok" | "partial" | "failed" =
+        finalReceipt.failedCount === 0
+          ? "ok"
+          : finalReceipt.confirmedCount > 0
+          ? "partial"
+          : "failed";
+
+      if (receiptState === "ok") {
         showNotification({
           type: "success",
           title: "Batch Logging Completed",
           message: `Successfully logged ${finalReceipt.confirmedCount} sales across ${finalReceipt.batchesExecuted} transaction(s)!`,
         });
+      } else if (receiptState === "partial") {
+        showNotification({
+          type: "warning",
+          title: "Batch Completed with Partial Errors",
+          message: `${finalReceipt.confirmedCount} sales confirmed, ${finalReceipt.failedCount} sales failed.`,
+        });
       } else {
         showNotification({
           type: "error",
-          title: "Batch Errors Encountered",
-          message: `${finalReceipt.failedCount} sales could not be logged.`,
+          title: "Batch Logging Failed",
+          message: `All ${finalReceipt.failedCount} sales could not be logged.`,
         });
       }
     } catch (err: unknown) {
@@ -281,13 +325,15 @@ export const BulkSaleLogModal: React.FC<BulkSaleLogModalProps> = ({
   const chunks = chunkSaleBatch(salesList, MAX_BATCH_SIZE);
   const totalOperations = salesList.length;
   const progressPercent = progress
-    ? Math.round(
-        ((progress.currentBatchIndex -
-          1 +
-          (progress.currentStatus === "confirmed" ? 1 : 0.5)) /
-          progress.totalBatches) *
-          100,
-      )
+    ? progress.currentStatus === "completed"
+      ? 100
+      : Math.round(
+          ((progress.currentBatchIndex -
+            1 +
+            (progress.currentStatus === "confirmed" || progress.currentStatus === "error" ? 1 : 0.5)) /
+            progress.totalBatches) *
+            100,
+        )
     : 0;
 
   return (
@@ -349,7 +395,8 @@ export const BulkSaleLogModal: React.FC<BulkSaleLogModalProps> = ({
                   onChange={(e) => setCsvText(e.target.value)}
                   placeholder="GB2P...,25.5,ORDER_101"
                   rows={3}
-                  className="w-full text-xs p-2.5 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-mono"
+                  aria-label="CSV input for bulk sales"
+                  className="w-full text-base sm:text-xs p-2.5 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-mono"
                 />
                 <Button size="sm" type="button" onClick={handleImportCsv} className="h-8 text-xs">
                   Import CSV Rows
@@ -363,6 +410,7 @@ export const BulkSaleLogModal: React.FC<BulkSaleLogModalProps> = ({
                   value={newAffiliate}
                   onChange={(e) => setNewAffiliate(e.target.value)}
                   placeholder="Affiliate Stellar Address (G...)"
+                  aria-label="Affiliate Stellar public address"
                   className="h-10 text-xs bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-800"
                 />
               </div>
@@ -373,6 +421,7 @@ export const BulkSaleLogModal: React.FC<BulkSaleLogModalProps> = ({
                   value={newAmount}
                   onChange={(e) => setNewAmount(e.target.value)}
                   placeholder="Amount XLM"
+                  aria-label="Sale amount in XLM"
                   className="h-10 text-xs bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-800"
                 />
               </div>
@@ -381,9 +430,15 @@ export const BulkSaleLogModal: React.FC<BulkSaleLogModalProps> = ({
                   value={newRef}
                   onChange={(e) => setNewRef(e.target.value)}
                   placeholder="Ref (optional)"
+                  aria-label="Customer order reference"
                   className="h-10 text-xs bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-800"
                 />
-                <Button type="submit" size="sm" className="h-10 px-3 bg-zinc-900 dark:bg-indigo-600 text-white shrink-0">
+                <Button
+                  type="submit"
+                  size="sm"
+                  aria-label="Add sale item"
+                  className="h-10 px-3 bg-zinc-900 dark:bg-indigo-600 text-white shrink-0"
+                >
                   <Plus className="w-4 h-4" />
                 </Button>
               </div>
@@ -392,36 +447,52 @@ export const BulkSaleLogModal: React.FC<BulkSaleLogModalProps> = ({
 
           {/* Template Generators & Clear Button */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-white dark:bg-zinc-900/80 border border-slate-200/80 dark:border-zinc-800 text-xs">
-            <div className="flex items-center space-x-2 text-zinc-600 dark:text-zinc-400">
-              <Cpu className="w-4 h-4 text-indigo-500" />
-              <span>Generate Test Templates:</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <button
-                type="button"
-                onClick={() => populateTemplateBatch(5)}
-                disabled={isProcessing}
-                className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 transition-colors"
-              >
-                5 Valid Sales
-              </button>
-              <button
-                type="button"
-                onClick={() => populateTemplateBatch(15)}
-                disabled={isProcessing}
-                className="px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 transition-colors"
-              >
-                15 Sales (Full Envelope)
-              </button>
-              <button
-                type="button"
-                onClick={handleClearAll}
-                disabled={isProcessing || salesList.length === 0}
-                className="px-2.5 py-1 rounded-lg text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-colors"
-              >
-                Clear All
-              </button>
-            </div>
+            {import.meta.env.DEV ? (
+              <>
+                <div className="flex items-center space-x-2 text-zinc-600 dark:text-zinc-400">
+                  <Cpu className="w-4 h-4 text-indigo-500" />
+                  <span>Generate Test Templates:</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <button
+                    type="button"
+                    onClick={() => populateTemplateBatch(5)}
+                    disabled={isProcessing}
+                    className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 transition-colors"
+                  >
+                    5 Valid Sales
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => populateTemplateBatch(15)}
+                    disabled={isProcessing}
+                    className="px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 transition-colors"
+                  >
+                    15 Sales (Full Envelope)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleClearAll}
+                    disabled={isProcessing || salesList.length === 0}
+                    className="px-2.5 py-1 rounded-lg text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-colors"
+                  >
+                    Clear All
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center justify-between w-full">
+                <span className="text-zinc-500 text-xs">Sales Queue ({salesList.length})</span>
+                <button
+                  type="button"
+                  onClick={handleClearAll}
+                  disabled={isProcessing || salesList.length === 0}
+                  className="px-2.5 py-1 rounded-lg text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-colors"
+                >
+                  Clear All
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Batch Summary Stats */}
@@ -565,43 +636,67 @@ export const BulkSaleLogModal: React.FC<BulkSaleLogModalProps> = ({
           )}
 
           {/* FINAL BATCH SUMMARY RECEIPT */}
-          {receipt && (
-            <div
-              className={`p-5 rounded-2xl ${
-                receipt.success
-                  ? "bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/40"
-                  : "bg-amber-50/60 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800/40"
-              } border space-y-4`}
-            >
-              <div className="flex items-center justify-between">
-                <div
-                  className={`flex items-center space-x-2 ${
-                    receipt.success
-                      ? "text-emerald-800 dark:text-emerald-300"
-                      : "text-amber-800 dark:text-amber-300"
-                  } font-bold`}
-                >
-                  {receipt.success ? (
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                  ) : (
-                    <AlertTriangle className="w-5 h-5 text-amber-600" />
-                  )}
-                  <span>
-                    {receipt.success
-                      ? "Bulk Execution Verified on Ledger"
-                      : "Bulk Execution Completed with Partial Errors"}
+          {receipt && (() => {
+            const receiptState: "ok" | "partial" | "failed" =
+              receipt.failedCount === 0
+                ? "ok"
+                : receipt.confirmedCount > 0
+                ? "partial"
+                : "failed";
+
+            const containerStyle =
+              receiptState === "ok"
+                ? "bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/40"
+                : receiptState === "partial"
+                ? "bg-amber-50/60 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800/40"
+                : "bg-rose-50/60 dark:bg-rose-950/20 border-rose-200 dark:border-rose-800/40";
+
+            const headerStyle =
+              receiptState === "ok"
+                ? "text-emerald-800 dark:text-emerald-300"
+                : receiptState === "partial"
+                ? "text-amber-800 dark:text-amber-300"
+                : "text-rose-800 dark:text-rose-300";
+
+            const badgeStyle =
+              receiptState === "ok"
+                ? "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-200"
+                : receiptState === "partial"
+                ? "bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-200"
+                : "bg-rose-100 dark:bg-rose-900/50 text-rose-800 dark:text-rose-200";
+
+            const headerText =
+              receiptState === "ok"
+                ? "Bulk Execution Verified on Ledger"
+                : receiptState === "partial"
+                ? "Bulk Execution Completed with Partial Errors"
+                : "Bulk Execution Failed";
+
+            const HeaderIcon =
+              receiptState === "ok"
+                ? CheckCircle2
+                : receiptState === "partial"
+                ? AlertTriangle
+                : XCircle;
+
+            const iconColor =
+              receiptState === "ok"
+                ? "text-emerald-600"
+                : receiptState === "partial"
+                ? "text-amber-600"
+                : "text-rose-600";
+
+            return (
+              <div className={`p-5 rounded-2xl ${containerStyle} border space-y-4`}>
+                <div className="flex items-center justify-between">
+                  <div className={`flex items-center space-x-2 ${headerStyle} font-bold`}>
+                    <HeaderIcon className={`w-5 h-5 ${iconColor}`} />
+                    <span>{headerText}</span>
+                  </div>
+                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${badgeStyle}`}>
+                    {receipt.confirmedCount} / {receipt.totalSalesCount} Confirmed
                   </span>
                 </div>
-                <span
-                  className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
-                    receipt.success
-                      ? "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-200"
-                      : "bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-200"
-                  }`}
-                >
-                  {receipt.confirmedCount} / {receipt.totalSalesCount} Confirmed
-                </span>
-              </div>
 
               {/* Footprint Optimization Statistics */}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs pt-1">
@@ -696,7 +791,8 @@ export const BulkSaleLogModal: React.FC<BulkSaleLogModalProps> = ({
                 </div>
               )}
             </div>
-          )}
+          );
+        })()}
 
           {/* Action Button */}
           <div className="pt-2">

@@ -112,8 +112,13 @@ export function validateSaleItems(sales: SaleItem[]): void {
     if (typeof s.saleAmountXlm !== "number" || !Number.isFinite(s.saleAmountXlm) || s.saleAmountXlm <= 0) {
       throw new Error(`Invalid saleAmountXlm for sale ${s.id}. Must be a positive number.`);
     }
-    const decStr = s.saleAmountXlm.toString().split(".")[1];
-    if (decStr && decStr.length > 7) {
+    const stroops = s.saleAmountXlm * 1e7;
+    const roundedStroops = Math.round(stroops);
+    if (
+      !Number.isSafeInteger(roundedStroops) ||
+      roundedStroops < 1 ||
+      Math.abs(stroops - roundedStroops) > 1e-5
+    ) {
       throw new Error(
         `Sale amount for sale ${s.id} (${s.saleAmountXlm}) exceeds Stellar's 7-decimal limit.`,
       );
@@ -338,6 +343,48 @@ export function buildBatchTransactionEnvelope(
 }
 
 /**
+ * Shared helper that polls for on-chain transaction confirmation.
+ * Returns immediately on SUCCESS, propagates FAILED without catching it as a transient error,
+ * retries transient RPC errors, and enforces a timeout covering the transaction timebound.
+ */
+export async function waitForConfirmation(
+  server: rpc.Server,
+  txHash: string,
+  timeoutMs: number = 95000,
+  pollIntervalMs: number = 1200,
+): Promise<rpc.Api.GetTransactionResponse> {
+  const startTime = Date.now();
+  let lastError: unknown = null;
+
+  while (Date.now() - startTime < timeoutMs) {
+    await new Promise((res) => setTimeout(res, pollIntervalMs));
+    let txStatus: rpc.Api.GetTransactionResponse;
+    try {
+      txStatus = await server.getTransaction(txHash);
+    } catch (pollErr: unknown) {
+      lastError = pollErr;
+      continue;
+    }
+
+    if (txStatus.status === "SUCCESS") {
+      return txStatus;
+    }
+    if (txStatus.status === "FAILED") {
+      throw new Error(`Batch transaction ${txHash} failed on ledger.`);
+    }
+  }
+
+  if (lastError) {
+    throw new Error(
+      `Batch transaction ${txHash} timed out after ${timeoutMs}ms waiting for ledger confirmation: ${
+        lastError instanceof Error ? lastError.message : String(lastError)
+      }`,
+    );
+  }
+  throw new Error(`Batch transaction ${txHash} timed out waiting for ledger confirmation.`);
+}
+
+/**
  * Executes a single batch of sales (up to 15) with footprint optimization and partial revert handling.
  */
 async function processBatchChunk(
@@ -497,9 +544,9 @@ async function processBatchChunk(
       consolidatedReadWriteCount: 0,
       redundantReadKeysPurged: 0,
     };
-    let recoverySimToAssemble: any = simResponse;
+    let recoverySimToAssemble: rpc.Api.SimulateTransactionSuccessResponse = simResponse;
 
-    if ("transactionData" in simResponse && simResponse.transactionData) {
+    if (simResponse.transactionData) {
       const { optimizedTxData, stats } = optimizeSorobanTransactionData(simResponse.transactionData);
       recoveryOptimizationStats = stats;
       recoverySimToAssemble = {
@@ -517,37 +564,18 @@ async function processBatchChunk(
 
     onProgress?.("submitting", undefined, "Submitting optimized batch transaction...");
     const sendResponse = await server.sendTransaction(signedTx);
-    if (sendResponse.status === "ERROR") {
+    if (sendResponse.status !== "PENDING" && sendResponse.status !== "DUPLICATE") {
+      const errorDetail = sendResponse.errorResult
+        ? JSON.stringify(sendResponse.errorResult)
+        : JSON.stringify(sendResponse);
       throw new Error(
-        `Failed to submit batch transaction: ${JSON.stringify(sendResponse.errorResult)}`,
+        `Failed to submit batch transaction (${sendResponse.status}): ${errorDetail}`,
       );
     }
     const txHash = sendResponse.hash;
 
-    // Poll until on-chain confirmation
-    let confirmed = false;
-    let attempts = 0;
-    const maxAttempts = 25;
-    while (attempts < maxAttempts) {
-      await new Promise((res) => setTimeout(res, 1200));
-      attempts++;
-      try {
-        const txStatus = await server.getTransaction(txHash);
-        if (txStatus.status === "SUCCESS") {
-          confirmed = true;
-          break;
-        }
-        if (txStatus.status === "FAILED") {
-          throw new Error(`Batch transaction ${txHash} failed on ledger.`);
-        }
-      } catch (pollErr: unknown) {
-        if (attempts >= maxAttempts) throw pollErr;
-      }
-    }
-
-    if (!confirmed) {
-      throw new Error(`Batch transaction ${txHash} timed out waiting for ledger confirmation.`);
-    }
+    // Poll until on-chain confirmation using shared helper
+    await waitForConfirmation(server, txHash);
 
     for (const v of validItems) {
       itemResults.push({
@@ -577,9 +605,9 @@ async function processBatchChunk(
     consolidatedReadWriteCount: 0,
     redundantReadKeysPurged: 0,
   };
-  let simToAssemble: any = simResponse;
+  let simToAssemble: rpc.Api.SimulateTransactionSuccessResponse = simResponse;
 
-  if ("transactionData" in simResponse && simResponse.transactionData) {
+  if (simResponse.transactionData) {
     const { optimizedTxData, stats } = optimizeSorobanTransactionData(simResponse.transactionData);
     batchOptimizationStats = stats;
     simToAssemble = {
@@ -597,37 +625,18 @@ async function processBatchChunk(
 
   onProgress?.("submitting", undefined, "Submitting batch transaction...");
   const sendResponse = await server.sendTransaction(signedTx);
-  if (sendResponse.status === "ERROR") {
+  if (sendResponse.status !== "PENDING" && sendResponse.status !== "DUPLICATE") {
+    const errorDetail = sendResponse.errorResult
+      ? JSON.stringify(sendResponse.errorResult)
+      : JSON.stringify(sendResponse);
     throw new Error(
-      `Failed to submit batch transaction: ${JSON.stringify(sendResponse.errorResult)}`,
+      `Failed to submit batch transaction (${sendResponse.status}): ${errorDetail}`,
     );
   }
   const txHash = sendResponse.hash;
 
-  // Poll until on-chain confirmation
-  let confirmed = false;
-  let attempts = 0;
-  const maxAttempts = 25;
-  while (attempts < maxAttempts) {
-    await new Promise((res) => setTimeout(res, 1200));
-    attempts++;
-    try {
-      const txStatus = await server.getTransaction(txHash);
-      if (txStatus.status === "SUCCESS") {
-        confirmed = true;
-        break;
-      }
-      if (txStatus.status === "FAILED") {
-        throw new Error(`Batch transaction ${txHash} failed on ledger.`);
-      }
-    } catch (pollErr: unknown) {
-      if (attempts >= maxAttempts) throw pollErr;
-    }
-  }
-
-  if (!confirmed) {
-    throw new Error(`Batch transaction ${txHash} timed out waiting for ledger confirmation.`);
-  }
+  // Poll until on-chain confirmation using shared helper
+  await waitForConfirmation(server, txHash);
 
   onProgress?.("confirmed", txHash, `Confirmed batch on ledger (${txHash.slice(0, 10)}...)`);
 

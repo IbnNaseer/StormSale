@@ -124,7 +124,7 @@ describe("Soroban Footprint Optimization & Multi-Operation Batches (#133)", () =
 
       // Redundant read keys purged:
       // 1 from collision (keyA), 1 duplicate read (keyB), 1 duplicate write (keyA) = 3 total purged
-      expect(stats.redundantReadKeysPurged).toBeGreaterThanOrEqual(2);
+      expect(stats.redundantReadKeysPurged).toBe(3);
     });
   });
 
@@ -140,10 +140,13 @@ describe("Soroban Footprint Optimization & Multi-Operation Batches (#133)", () =
       const args = buildLogSaleArgs(dummyMerchant, sale);
       expect(args.length).toBe(4);
       // ScVal 0: Advertiser Address
+      expect(scValToNative(args[0])).toBe(dummyMerchant);
       // ScVal 1: Campaign ID (u32)
-      // ScVal 2: Affiliate Address
-      // ScVal 3: Amount in stroops (10.5 XLM = 105,000,000 stroops as i128)
       expect(scValToNative(args[1])).toBe(101);
+      // ScVal 2: Affiliate Address
+      expect(scValToNative(args[2])).toBe(dummyAffiliate1);
+      // ScVal 3: Amount in stroops (10.5 XLM = 105,000,000 stroops as i128)
+      expect(scValToNative(args[3])).toBe(105000000n);
     });
 
     it("should build a single transaction envelope containing multiple log_sale operations", () => {
@@ -184,10 +187,9 @@ describe("Soroban Footprint Optimization & Multi-Operation Batches (#133)", () =
       expect(receipt.batchesExecuted).toBe(2);
       expect(receipt.transactionHashes.length).toBe(2);
 
-      // Verify transaction hashes are valid hex strings
+      // Verify transaction hashes are valid 64-character hex strings without 0x prefix
       for (const hash of receipt.transactionHashes) {
-        expect(hash.startsWith("0x")).toBe(true);
-        expect(hash.length).toBe(66);
+        expect(hash).toMatch(/^[0-9a-f]{64}$/);
       }
 
       // Verify itemized results mapping
@@ -218,6 +220,32 @@ describe("Soroban Footprint Optimization & Multi-Operation Batches (#133)", () =
       expect(receipt.footprintStats).toBeDefined();
       expect(receipt.footprintStats.redundantReadKeysPurged).toBeGreaterThan(0);
       expect(receipt.footprintStats.consolidatedReadOnlyCount).toBeGreaterThan(0);
+    });
+
+    it("should throw validation error when an affiliate address is invalid", () => {
+      expect(() => {
+        validateSaleItems([
+          {
+            id: "SALE_BAD",
+            campaignId: 101,
+            affiliateAddress: "INVALID_ADDRESS_12345",
+            saleAmountXlm: 20.0,
+          },
+        ]);
+      }).toThrow(/not a valid Stellar public key/);
+    });
+
+    it("should throw validation error when sale amount exceeds 7 decimals", () => {
+      expect(() => {
+        validateSaleItems([
+          {
+            id: "SALE_DEC",
+            campaignId: 101,
+            affiliateAddress: dummyAffiliate1,
+            saleAmountXlm: 12.12345678,
+          },
+        ]);
+      }).toThrow(/7-decimal limit/);
     });
   });
 });

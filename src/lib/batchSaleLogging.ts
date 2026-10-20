@@ -8,6 +8,7 @@ import {
   BASE_FEE,
   xdr,
   Keypair,
+  StrKey,
 } from "@stellar/stellar-sdk";
 import { STELLAR_CONFIG } from "../config/stellar";
 import { signWalletTransaction, getSorobanRpcServer, type WalletType } from "./stellar";
@@ -100,8 +101,22 @@ export function validateSaleItems(sales: SaleItem[]): void {
     if (!s.affiliateAddress || typeof s.affiliateAddress !== "string") {
       throw new Error(`Invalid affiliate address for sale ${s.id}.`);
     }
+    if (
+      !StrKey.isValidEd25519PublicKey(s.affiliateAddress) &&
+      !StrKey.isValidContract(s.affiliateAddress)
+    ) {
+      throw new Error(
+        `Affiliate address "${s.affiliateAddress}" is not a valid Stellar public key (G...) or contract ID (C...) for sale ${s.id}.`,
+      );
+    }
     if (typeof s.saleAmountXlm !== "number" || !Number.isFinite(s.saleAmountXlm) || s.saleAmountXlm <= 0) {
       throw new Error(`Invalid saleAmountXlm for sale ${s.id}. Must be a positive number.`);
+    }
+    const decStr = s.saleAmountXlm.toString().split(".")[1];
+    if (decStr && decStr.length > 7) {
+      throw new Error(
+        `Sale amount for sale ${s.id} (${s.saleAmountXlm}) exceeds Stellar's 7-decimal limit.`,
+      );
     }
   }
 }
@@ -119,6 +134,33 @@ export function chunkSaleBatch<T>(items: T[], maxBatchSize: number = MAX_BATCH_S
   return chunks;
 }
 
+function getXdrArray<T = any>(parent: any, field: string): T[] {
+  if (!parent) return [];
+  const val = parent[field];
+  if (typeof val === "function") {
+    const res = val.call(parent);
+    if (Array.isArray(res)) return res;
+  }
+  if (Array.isArray(val)) return val;
+  if (parent._attributes && Array.isArray(parent._attributes[field])) {
+    return parent._attributes[field];
+  }
+  return [];
+}
+
+function getXdrValue<T = any>(parent: any, field: string): T {
+  if (!parent) return undefined as any;
+  const val = parent[field];
+  if (typeof val === "function") {
+    return val.call(parent);
+  }
+  if (val !== undefined) return val;
+  if (parent._attributes && parent._attributes[field] !== undefined) {
+    return parent._attributes[field];
+  }
+  return undefined as any;
+}
+
 /**
  * Consolidates a Soroban ledger footprint:
  * 1. Deduplicates readOnly keys.
@@ -129,18 +171,8 @@ export function chunkSaleBatch<T>(items: T[], maxBatchSize: number = MAX_BATCH_S
 export function consolidateFootprint(
   footprint: xdr.LedgerFootprint,
 ): { optimizedFootprint: xdr.LedgerFootprint; stats: FootprintOptimizationStats } {
-  const originalReadOnly: xdr.LedgerKey[] =
-    typeof (footprint as any).readOnly === "function"
-      ? (footprint as any).readOnly()
-      : Array.isArray((footprint as any).readOnly)
-        ? (footprint as any).readOnly
-        : [];
-  const originalReadWrite: xdr.LedgerKey[] =
-    typeof (footprint as any).readWrite === "function"
-      ? (footprint as any).readWrite()
-      : Array.isArray((footprint as any).readWrite)
-        ? (footprint as any).readWrite
-        : [];
+  const originalReadOnly = getXdrArray<xdr.LedgerKey>(footprint, "readOnly");
+  const originalReadWrite = getXdrArray<xdr.LedgerKey>(footprint, "readWrite");
 
   const readWriteMap = new Map<string, xdr.LedgerKey>();
   for (const key of originalReadWrite) {
@@ -190,31 +222,32 @@ export function consolidateFootprint(
 }
 
 /**
- * Optimizes SorobanTransactionData by consolidating its LedgerFootprint.
+ * Optimizes SorobanTransactionData (or SorobanDataBuilder) by consolidating its LedgerFootprint.
  */
 export function optimizeSorobanTransactionData(
-  txData: xdr.SorobanTransactionData,
-): { optimizedTxData: xdr.SorobanTransactionData; stats: FootprintOptimizationStats } {
-  const resources: xdr.SorobanResources =
-    typeof (txData as any).resources === "function" ? (txData as any).resources() : (txData as any).resources;
-  const currentFootprint: xdr.LedgerFootprint =
-    typeof (resources as any).footprint === "function" ? (resources as any).footprint() : (resources as any).footprint;
+  txData: xdr.SorobanTransactionData | any,
+): { optimizedTxData: any; stats: FootprintOptimizationStats } {
+  // If txData is a SorobanDataBuilder (as returned by simulateTransaction in stellar-sdk)
+  if (
+    txData &&
+    typeof txData.getFootprint === "function" &&
+    typeof txData.setFootprint === "function"
+  ) {
+    const rawFp = txData.getFootprint();
+    const { optimizedFootprint, stats } = consolidateFootprint(rawFp);
+    const readOnlyKeys = getXdrArray<xdr.LedgerKey>(optimizedFootprint, "readOnly");
+    const readWriteKeys = getXdrArray<xdr.LedgerKey>(optimizedFootprint, "readWrite");
+    txData.setFootprint(readOnlyKeys, readWriteKeys);
+    return { optimizedTxData: txData, stats };
+  }
+
+  const resources = getXdrValue<xdr.SorobanResources>(txData, "resources");
+  const currentFootprint = getXdrValue<xdr.LedgerFootprint>(resources, "footprint");
   const { optimizedFootprint, stats } = consolidateFootprint(currentFootprint);
 
-  const instructions =
-    typeof (resources as any).instructions === "function"
-      ? (resources as any).instructions()
-      : (resources as any).instructions;
-  const diskReadBytes =
-    typeof (resources as any).diskReadBytes === "function"
-      ? (resources as any).diskReadBytes()
-      : typeof (resources as any).diskReadBytes === "number"
-        ? (resources as any).diskReadBytes
-        : 0;
-  const writeBytes =
-    typeof (resources as any).writeBytes === "function"
-      ? (resources as any).writeBytes()
-      : (resources as any).writeBytes;
+  const instructions = getXdrValue<number>(resources, "instructions") ?? 0;
+  const diskReadBytes = getXdrValue<number>(resources, "diskReadBytes") ?? 0;
+  const writeBytes = getXdrValue<number>(resources, "writeBytes") ?? 0;
 
   const optimizedResources = new xdr.SorobanResources({
     footprint: optimizedFootprint,
@@ -223,12 +256,8 @@ export function optimizeSorobanTransactionData(
     writeBytes,
   });
 
-  const ext =
-    typeof (txData as any).ext === "function" ? (txData as any).ext() : (txData as any).ext;
-  const resourceFee =
-    typeof (txData as any).resourceFee === "function"
-      ? (txData as any).resourceFee()
-      : (txData as any).resourceFee;
+  const ext = getXdrValue<xdr.ExtensionPoint>(txData, "ext") ?? xdr.ExtensionPoint.v0();
+  const resourceFee = getXdrValue<xdr.Int64>(txData, "resourceFee");
 
   const optimizedTxData = new xdr.SorobanTransactionData({
     ext,
@@ -243,19 +272,22 @@ export function optimizeSorobanTransactionData(
  * Generates an ScVal array for contract `log_sale` invocation.
  */
 export function buildLogSaleArgs(advertiserAddress: string, sale: SaleItem): xdr.ScVal[] {
-  const amountStroops = BigInt(Math.floor(sale.saleAmountXlm * 1e7));
-  let advAddressVal: xdr.ScVal;
-  try {
-    advAddressVal = new Address(advertiserAddress).toScVal();
-  } catch {
-    advAddressVal = new Address(Keypair.random().publicKey()).toScVal();
+  if (
+    !StrKey.isValidEd25519PublicKey(advertiserAddress) &&
+    !StrKey.isValidContract(advertiserAddress)
+  ) {
+    throw new Error(`Invalid advertiser address "${advertiserAddress}".`);
   }
-  let affAddressVal: xdr.ScVal;
-  try {
-    affAddressVal = new Address(sale.affiliateAddress).toScVal();
-  } catch {
-    affAddressVal = new Address(Keypair.random().publicKey()).toScVal();
+  if (
+    !StrKey.isValidEd25519PublicKey(sale.affiliateAddress) &&
+    !StrKey.isValidContract(sale.affiliateAddress)
+  ) {
+    throw new Error(`Invalid affiliate address "${sale.affiliateAddress}" for sale ${sale.id}.`);
   }
+
+  const amountStroops = BigInt(Math.round(sale.saleAmountXlm * 1e7));
+  const advAddressVal = new Address(advertiserAddress).toScVal();
+  const affAddressVal = new Address(sale.affiliateAddress).toScVal();
 
   return [
     advAddressVal,
@@ -276,7 +308,7 @@ function generateMockTxHash(): string {
   } else {
     for (let i = 0; i < bytes.length; i++) bytes[i] = Math.floor(Math.random() * 256);
   }
-  return "0x" + Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
 /**
@@ -318,11 +350,8 @@ async function processBatchChunk(
   txHash?: string;
   stats: FootprintOptimizationStats;
 }> {
-  // Mock mode for tests or sandbox simulation
-  const isMock =
-    walletType === "mock" ||
-    advertiserAddress.startsWith("GASTORMSALE7") ||
-    (typeof window !== "undefined" && (window as any).__MOCK_BATCH__);
+  // Mock mode strictly for tests or when "mock" connector is explicitly selected
+  const isMock = walletType === "mock";
 
   if (isMock) {
     onProgress?.("simulating", undefined, "Simulating Soroban batch operations...");
@@ -375,11 +404,18 @@ async function processBatchChunk(
     account = await server.getAccount(advertiserAddress);
   } catch (err: unknown) {
     const reason = err instanceof Error ? err.message : String(err);
-    throw new Error(`Failed to load advertiser account on ledger: ${reason}`);
+    throw new Error(`Failed to load advertiser account on ledger: ${reason}`, { cause: err });
   }
 
-  // 1. Build preliminary transaction envelope with all ops
-  const preliminaryTx = buildBatchTransactionEnvelope(account, advertiserAddress, chunk).build();
+  // Preserve base sequence number to avoid advancing sequences on simulation probes
+  const baseSequence = account.sequenceNumber();
+
+  // 1. Build preliminary transaction envelope with all ops using isolated sequence
+  const preliminaryTx = buildBatchTransactionEnvelope(
+    new Account(advertiserAddress, baseSequence),
+    advertiserAddress,
+    chunk,
+  ).build();
 
   onProgress?.("simulating", undefined, "Simulating multi-operation batch envelope...");
   let simResponse = await server.simulateTransaction(preliminaryTx);
@@ -397,7 +433,11 @@ async function processBatchChunk(
 
     for (const item of chunk) {
       try {
-        const singleTx = buildBatchTransactionEnvelope(account, advertiserAddress, [item]).build();
+        const singleTx = buildBatchTransactionEnvelope(
+          new Account(advertiserAddress, baseSequence),
+          advertiserAddress,
+          [item],
+        ).build();
         const singleSim = await server.simulateTransaction(singleTx);
         if (rpc.Api.isSimulationError(singleSim)) {
           itemResults.push({
@@ -437,16 +477,39 @@ async function processBatchChunk(
       };
     }
 
-    // Re-simulate with only valid items
-    const recoveryTx = buildBatchTransactionEnvelope(account, advertiserAddress, validItems).build();
+    // Re-simulate with only valid items using isolated account
+    const recoveryTx = buildBatchTransactionEnvelope(
+      new Account(advertiserAddress, baseSequence),
+      advertiserAddress,
+      validItems,
+    ).build();
     simResponse = await server.simulateTransaction(recoveryTx);
     if (rpc.Api.isSimulationError(simResponse)) {
       throw new Error(`Simulation failed after partial recovery: ${simResponse.error}`);
     }
 
-    // Proceed to submit valid items
-    const preparedTx = rpc.assembleTransaction(recoveryTx, simResponse).build();
+    // Optimize footprint before assembling transaction
     onProgress?.("optimizing_footprint", undefined, "Consolidating Soroban footprint...");
+    let recoveryOptimizationStats: FootprintOptimizationStats = {
+      originalReadOnlyCount: 0,
+      originalReadWriteCount: 0,
+      consolidatedReadOnlyCount: 0,
+      consolidatedReadWriteCount: 0,
+      redundantReadKeysPurged: 0,
+    };
+    let recoverySimToAssemble: any = simResponse;
+
+    if ("transactionData" in simResponse && simResponse.transactionData) {
+      const { optimizedTxData, stats } = optimizeSorobanTransactionData(simResponse.transactionData);
+      recoveryOptimizationStats = stats;
+      recoverySimToAssemble = {
+        ...simResponse,
+        transactionData: optimizedTxData,
+      };
+    }
+
+    // Proceed to assemble and submit valid items
+    const preparedTx = rpc.assembleTransaction(recoveryTx, recoverySimToAssemble).build();
 
     onProgress?.("signing", undefined, "Waiting for wallet signature...");
     const signedXdr = await signWalletTransaction(preparedTx.toXDR(), walletType);
@@ -454,7 +517,37 @@ async function processBatchChunk(
 
     onProgress?.("submitting", undefined, "Submitting optimized batch transaction...");
     const sendResponse = await server.sendTransaction(signedTx);
+    if (sendResponse.status === "ERROR") {
+      throw new Error(
+        `Failed to submit batch transaction: ${JSON.stringify(sendResponse.errorResult)}`,
+      );
+    }
     const txHash = sendResponse.hash;
+
+    // Poll until on-chain confirmation
+    let confirmed = false;
+    let attempts = 0;
+    const maxAttempts = 25;
+    while (attempts < maxAttempts) {
+      await new Promise((res) => setTimeout(res, 1200));
+      attempts++;
+      try {
+        const txStatus = await server.getTransaction(txHash);
+        if (txStatus.status === "SUCCESS") {
+          confirmed = true;
+          break;
+        }
+        if (txStatus.status === "FAILED") {
+          throw new Error(`Batch transaction ${txHash} failed on ledger.`);
+        }
+      } catch (pollErr: unknown) {
+        if (attempts >= maxAttempts) throw pollErr;
+      }
+    }
+
+    if (!confirmed) {
+      throw new Error(`Batch transaction ${txHash} timed out waiting for ledger confirmation.`);
+    }
 
     for (const v of validItems) {
       itemResults.push({
@@ -471,19 +564,31 @@ async function processBatchChunk(
     return {
       results: itemResults,
       txHash,
-      stats: {
-        originalReadOnlyCount: 0,
-        originalReadWriteCount: 0,
-        consolidatedReadOnlyCount: 0,
-        consolidatedReadWriteCount: 0,
-        redundantReadKeysPurged: 0,
-      },
+      stats: recoveryOptimizationStats,
     };
   }
 
-  // 2. Assemble and optimize footprint
+  // 2. Assemble and optimize footprint for standard batch
   onProgress?.("optimizing_footprint", undefined, "Consolidating Soroban footprint...");
-  const assembledTx = rpc.assembleTransaction(preliminaryTx, simResponse).build();
+  let batchOptimizationStats: FootprintOptimizationStats = {
+    originalReadOnlyCount: 0,
+    originalReadWriteCount: 0,
+    consolidatedReadOnlyCount: 0,
+    consolidatedReadWriteCount: 0,
+    redundantReadKeysPurged: 0,
+  };
+  let simToAssemble: any = simResponse;
+
+  if ("transactionData" in simResponse && simResponse.transactionData) {
+    const { optimizedTxData, stats } = optimizeSorobanTransactionData(simResponse.transactionData);
+    batchOptimizationStats = stats;
+    simToAssemble = {
+      ...simResponse,
+      transactionData: optimizedTxData,
+    };
+  }
+
+  const assembledTx = rpc.assembleTransaction(preliminaryTx, simToAssemble).build();
 
   // 3. Sign & Submit
   onProgress?.("signing", undefined, "Awaiting wallet signature...");
@@ -492,7 +597,37 @@ async function processBatchChunk(
 
   onProgress?.("submitting", undefined, "Submitting batch transaction...");
   const sendResponse = await server.sendTransaction(signedTx);
+  if (sendResponse.status === "ERROR") {
+    throw new Error(
+      `Failed to submit batch transaction: ${JSON.stringify(sendResponse.errorResult)}`,
+    );
+  }
   const txHash = sendResponse.hash;
+
+  // Poll until on-chain confirmation
+  let confirmed = false;
+  let attempts = 0;
+  const maxAttempts = 25;
+  while (attempts < maxAttempts) {
+    await new Promise((res) => setTimeout(res, 1200));
+    attempts++;
+    try {
+      const txStatus = await server.getTransaction(txHash);
+      if (txStatus.status === "SUCCESS") {
+        confirmed = true;
+        break;
+      }
+      if (txStatus.status === "FAILED") {
+        throw new Error(`Batch transaction ${txHash} failed on ledger.`);
+      }
+    } catch (pollErr: unknown) {
+      if (attempts >= maxAttempts) throw pollErr;
+    }
+  }
+
+  if (!confirmed) {
+    throw new Error(`Batch transaction ${txHash} timed out waiting for ledger confirmation.`);
+  }
 
   onProgress?.("confirmed", txHash, `Confirmed batch on ledger (${txHash.slice(0, 10)}...)`);
 
@@ -508,13 +643,7 @@ async function processBatchChunk(
   return {
     results,
     txHash,
-    stats: {
-      originalReadOnlyCount: 0,
-      originalReadWriteCount: 0,
-      consolidatedReadOnlyCount: 0,
-      consolidatedReadWriteCount: 0,
-      redundantReadKeysPurged: 0,
-    },
+    stats: batchOptimizationStats,
   };
 }
 

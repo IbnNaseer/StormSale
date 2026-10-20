@@ -17,6 +17,19 @@ import ko from "../locales/ko.json";
 import ar from "../locales/ar.json";
 import ru from "../locales/ru.json";
 
+const localeObjects = [
+  { name: "en", data: en },
+  { name: "es", data: es },
+  { name: "pt", data: pt },
+  { name: "fr", data: fr },
+  { name: "de", data: de },
+  { name: "zh", data: zh },
+  { name: "ja", data: ja },
+  { name: "ko", data: ko },
+  { name: "ar", data: ar },
+  { name: "ru", data: ru },
+] as const;
+
 describe("i18n Internationalization Framework", () => {
   beforeEach(async () => {
     await i18n.changeLanguage("en");
@@ -24,61 +37,39 @@ describe("i18n Internationalization Framework", () => {
 
   it("should configure exactly 10 supported locales", () => {
     expect(SUPPORTED_LOCALES).toHaveLength(10);
-    const codes = SUPPORTED_LOCALES.map((l) => l.code);
+    const codes = SUPPORTED_LOCALES.map((locale) => locale.code);
     expect(codes).toEqual(["en", "es", "pt", "fr", "de", "zh", "ja", "ko", "ar", "ru"]);
   });
 
   it("should have all 10 locale resources registered in i18n", () => {
-    const supportedCodes = ["en", "es", "pt", "fr", "de", "zh", "ja", "ko", "ar", "ru"];
+    const supportedCodes = ["en", "es", "pt", "fr", "de", "zh", "ja", "ko", "ar", "ru"]; 
+    const localeEntries = Object.entries(resources) as [string, { translation: unknown }][];
+
+    expect(localeEntries).toHaveLength(10);
     supportedCodes.forEach((code) => {
       expect(resources).toHaveProperty(code);
-      const localeKey = code as keyof typeof resources;
-      expect(resources[localeKey]).toHaveProperty("translation");
+      expect(localeEntries.some(([localeCode]) => localeCode === code)).toBe(true);
     });
   });
 
   it("should have consistent top-level namespaces across all 10 locale files", () => {
-    const localeObjects = [
-      { name: "en", data: en },
-      { name: "es", data: es },
-      { name: "pt", data: pt },
-      { name: "fr", data: fr },
-      { name: "de", data: de },
-      { name: "zh", data: zh },
-      { name: "ja", data: ja },
-      { name: "ko", data: ko },
-      { name: "ar", data: ar },
-      { name: "ru", data: ru },
-    ];
-
-    type Namespace = keyof typeof en;
-    const expectedNamespaces: Namespace[] = [
-      "nav",
-      "header",
-      "common",
-      "dashboard",
-      "affiliate",
-      "advertiser",
-    ];
+    const expectedNamespaces = ["nav", "header", "common", "dashboard", "affiliate", "advertiser"] as const;
 
     localeObjects.forEach(({ name, data }) => {
-      expectedNamespaces.forEach((ns) => {
-        expect(data, `Locale ${name} is missing namespace: ${ns}`).toHaveProperty(ns);
-        const nsObj = data[ns];
-        expect(
-          Object.keys(nsObj).length,
-          `Locale ${name} namespace ${ns} should not be empty`,
-        ).toBeGreaterThan(0);
+      expectedNamespaces.forEach((namespace) => {
+        const namespaceKey = namespace as keyof typeof en;
+        expect(data, `Locale ${name} is missing namespace: ${namespace}`).toHaveProperty(namespace);
+        const nsObj = data[namespaceKey];
+        expect(Object.keys(nsObj as Record<string, unknown>).length, `Locale ${name} namespace ${namespace} should not be empty`).toBeGreaterThan(0);
       });
     });
   });
 
   it("should have matching nav keys across all locales", () => {
     const enNavKeys = Object.keys(en.nav);
-    const localeObjects = [es, pt, fr, de, zh, ja, ko, ar, ru];
 
-    localeObjects.forEach((localeData) => {
-      expect(Object.keys(localeData.nav)).toEqual(enNavKeys);
+    localeObjects.slice(1).forEach(({ data }) => {
+      expect(Object.keys(data.nav)).toEqual(enNavKeys);
     });
   });
 
@@ -117,11 +108,11 @@ describe("i18n Internationalization Framework", () => {
   });
 
   it("should mark Arabic as RTL in SUPPORTED_LOCALES metadata", () => {
-    const arLocale = SUPPORTED_LOCALES.find((l) => l.code === "ar");
+    const arLocale = SUPPORTED_LOCALES.find((locale) => locale.code === "ar");
     expect(arLocale).toBeDefined();
     expect(arLocale?.dir).toBe("rtl");
 
-    const enLocale = SUPPORTED_LOCALES.find((l) => l.code === "en");
+    const enLocale = SUPPORTED_LOCALES.find((locale) => locale.code === "en");
     expect(enLocale?.dir).toBe("ltr");
   });
 
@@ -131,9 +122,9 @@ describe("i18n Internationalization Framework", () => {
       dir: "",
       lang: "",
       classList: {
-        add: (cls: string) => classListSet.add(cls),
-        remove: (cls: string) => classListSet.delete(cls),
-        contains: (cls: string) => classListSet.has(cls),
+        add: (className: string) => classListSet.add(className),
+        remove: (className: string) => classListSet.delete(className),
+        contains: (className: string) => classListSet.has(className),
       },
     };
 

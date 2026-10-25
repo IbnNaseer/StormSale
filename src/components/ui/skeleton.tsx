@@ -7,7 +7,7 @@ export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
 
 /**
  * Base Skeleton component with pulse animation and theme-aware background colors.
- * Merges the legacy and PR variants so both APIs remain compatible.
+ * Merges legacy and PR variants so both APIs work together.
  */
 export const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
   ({ className, variant = "default", ...props }, ref) => {
@@ -23,7 +23,7 @@ export const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
     const baseStyles =
       variant === "zinc800"
         ? "animate-pulse bg-zinc-800"
-        : "animate-pulse bg-zinc-200/80 bg-slate-200/80 dark:bg-zinc-800 transition-colors duration-200";
+        : "animate-pulse bg-zinc-200/80 dark:bg-zinc-800 transition-colors duration-200";
 
     return (
       <div
@@ -37,6 +37,7 @@ export const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
     );
   },
 );
+
 Skeleton.displayName = "Skeleton";
 
 /**
@@ -182,7 +183,6 @@ export function SkeletonWidget({
 /**
  * Table skeleton loader matching Table, TableHeader, TableRow, and TableCell.
  * Configurable row and column counts ensure exact dimension parity with live data.
- * This version merges both old and new prop contracts.
  */
 export interface SkeletonTableProps extends React.HTMLAttributes<HTMLDivElement> {
   rows?: number;
@@ -201,13 +201,7 @@ export const TableSkeleton: React.FC<SkeletonTableProps> = ({
   className,
   ...props
 }) => {
-  const legacyColumnWidths = [
-    "w-1/4",
-    "w-1/3",
-    "w-1/5",
-    "w-1/6",
-    "w-1/4",
-  ];
+  const legacyColumnWidths = ["w-1/4", "w-1/3", "w-1/5", "w-1/6", "w-1/4"];
   const effectiveWidths =
     columnWidths ||
     Array.from({ length: columns }, (_, index) => legacyColumnWidths[index % legacyColumnWidths.length]);
@@ -237,16 +231,15 @@ export const TableSkeleton: React.FC<SkeletonTableProps> = ({
 
       <div className="divide-y divide-zinc-100 dark:divide-zinc-800/50">
         {Array.from({ length: rows }).map((_, rowIndex) => (
-          <div
-            key={`row-${rowIndex}`}
-            className="p-4 flex items-center gap-4 min-h-[56px]"
-          >
+          <div key={`row-${rowIndex}`} className="p-4 flex items-center gap-4 min-h-[56px]">
             {Array.from({ length: columns }).map((_, colIndex) => (
               <Skeleton
                 key={`cell-${rowIndex}-${colIndex}`}
                 className={cn(
                   "h-4",
-                  colIndex === 0 ? "w-28 font-medium" : effectiveWidths[colIndex % effectiveWidths.length],
+                  colIndex === 0
+                    ? "w-28 font-medium"
+                    : effectiveWidths[colIndex % effectiveWidths.length],
                 )}
               />
             ))}

@@ -2,11 +2,12 @@ import * as React from "react";
 import { cn } from "../../lib/utils";
 
 export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: "default" | "circular" | "rounded" | "text";
+  variant?: "default" | "zinc800" | "shimmer" | "circular" | "rounded" | "text";
 }
 
 /**
- * Base Skeleton component featuring pulsing Zinc-800 animation in dark mode.
+ * Base Skeleton component with pulse animation and theme-aware background colors.
+ * Merges both the legacy and PR variants to keep compatibility with the older API and the newer dashboard designs.
  */
 export const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
   ({ className, variant = "default", ...props }, ref) => {
@@ -15,18 +16,22 @@ export const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
       circular: "rounded-full",
       rounded: "rounded-2xl",
       text: "rounded h-4 w-full",
+      shimmer: "rounded-md",
+      zinc800: "rounded-md bg-zinc-800",
     };
+
+    const baseStyles =
+      variant === "zinc800"
+        ? "animate-pulse bg-zinc-800"
+        : "animate-pulse bg-zinc-200/80 bg-slate-200/80 dark:bg-zinc-800 transition-colors duration-200";
 
     return (
       <div
         ref={ref}
         role="status"
         aria-label="Loading..."
-        className={cn(
-          "animate-pulse bg-slate-200/80 dark:bg-zinc-800 transition-colors duration-200",
-          variantStyles[variant],
-          className,
-        )}
+        aria-live="polite"
+        className={cn(baseStyles, variantStyles[variant] ?? "rounded-md", className)}
         {...props}
       />
     );
@@ -34,14 +39,205 @@ export const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
 );
 Skeleton.displayName = "Skeleton";
 
+export interface SkeletonTextProps extends React.HTMLAttributes<HTMLDivElement> {
+  lines?: number;
+  lineClassName?: string;
+}
+
+export function SkeletonText({ lines = 3, className, lineClassName, ...props }: SkeletonTextProps) {
+  const widthPercentages = ["w-full", "w-11/12", "w-4/5", "w-3/4", "w-3/5"];
+
+  return (
+    <div className={cn("space-y-2", className)} {...props}>
+      {Array.from({ length: lines }).map((_, index) => (
+        <Skeleton
+          key={index}
+          className={cn("h-4", widthPercentages[index % widthPercentages.length], lineClassName)}
+        />
+      ))}
+    </div>
+  );
+}
+
+export interface SkeletonAvatarProps extends React.HTMLAttributes<HTMLDivElement> {
+  size?: "sm" | "md" | "lg" | "xl";
+}
+
+export function SkeletonAvatar({ size = "md", className, ...props }: SkeletonAvatarProps) {
+  const sizeClasses = {
+    sm: "w-8 h-8",
+    md: "w-10 h-10",
+    lg: "w-12 h-12",
+    xl: "w-16 h-16",
+  };
+
+  return <Skeleton className={cn("rounded-full shrink-0", sizeClasses[size], className)} {...props} />;
+}
+
+export interface SkeletonButtonProps extends React.HTMLAttributes<HTMLDivElement> {
+  size?: "sm" | "default" | "lg" | "icon";
+}
+
+export function SkeletonButton({ size = "default", className, ...props }: SkeletonButtonProps) {
+  const sizeClasses = {
+    sm: "h-8 w-20 rounded-lg",
+    default: "h-9 w-28 rounded-xl",
+    lg: "h-11 w-36 rounded-2xl",
+    icon: "h-8 w-8 rounded-lg",
+  };
+
+  return <Skeleton className={cn(sizeClasses[size], className)} {...props} />;
+}
+
+export interface SkeletonMetricProps extends React.HTMLAttributes<HTMLDivElement> {
+  hasSubtext?: boolean;
+}
+
+export function SkeletonMetric({ hasSubtext = true, className, ...props }: SkeletonMetricProps) {
+  return (
+    <div
+      role="status"
+      aria-label="Loading metric..."
+      className={cn(
+        "p-6 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white/50 dark:bg-zinc-900/50 space-y-3",
+        className,
+      )}
+      {...props}
+    >
+      <div className="flex items-center justify-between">
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-8 w-8 rounded-lg" />
+      </div>
+      <Skeleton className="h-8 w-36" />
+      {hasSubtext && (
+        <div className="flex items-center gap-2 pt-1">
+          <Skeleton className="h-3.5 w-12 rounded" />
+          <Skeleton className="h-3.5 w-28" />
+        </div>
+      )}
+    </div>
+  );
+}
+
+export interface SkeletonWidgetProps extends React.HTMLAttributes<HTMLDivElement> {
+  height?: string | number;
+  showHeaderAction?: boolean;
+}
+
+export function SkeletonWidget({
+  height = "h-48",
+  showHeaderAction = true,
+  className,
+  ...props
+}: SkeletonWidgetProps) {
+  return (
+    <div
+      role="status"
+      aria-label="Loading widget..."
+      className={cn(
+        "rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 space-y-4 shadow-sm",
+        className,
+      )}
+      {...props}
+    >
+      <div className="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800/60">
+        <div className="space-y-1.5">
+          <Skeleton className="h-5 w-40" />
+          <Skeleton className="h-3.5 w-60" />
+        </div>
+        {showHeaderAction && <Skeleton className="h-8 w-24 rounded-lg" />}
+      </div>
+      <div
+        className={cn(
+          "w-full rounded-lg bg-zinc-100 dark:bg-zinc-800/40 p-4 flex flex-col justify-end space-y-2",
+          typeof height === "string" ? height : undefined,
+        )}
+        style={typeof height === "number" ? { height } : undefined}
+      >
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-4 w-1/2" />
+      </div>
+    </div>
+  );
+}
+
+export interface SkeletonTableProps extends React.HTMLAttributes<HTMLDivElement> {
+  rows?: number;
+  columns?: number;
+  showPagination?: boolean;
+  columnWidths?: string[];
+  showHeader?: boolean;
+}
+
+export function SkeletonTable({
+  rows = 5,
+  columns = 4,
+  showPagination = true,
+  columnWidths,
+  showHeader = true,
+  className,
+  ...props
+}: SkeletonTableProps) {
+  const legacyColumnWidths = ["w-1/4", "w-1/3", "w-1/5", "w-1/6", "w-1/4"];
+  const effectiveWidths = columnWidths || Array.from({ length: columns }, (_, index) => legacyColumnWidths[index % legacyColumnWidths.length]);
+
+  return (
+    <div
+      role="status"
+      aria-label="Loading table..."
+      className={cn(
+        "w-full rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden bg-white dark:bg-zinc-900 shadow-sm",
+        className,
+      )}
+      {...props}
+    >
+      {showHeader && (
+        <div className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50 p-4">
+          <div className="flex items-center gap-4">
+            {Array.from({ length: columns }).map((_, colIndex) => (
+              <Skeleton
+                key={`header-${colIndex}`}
+                className={cn("h-4", effectiveWidths[colIndex % effectiveWidths.length])}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="divide-y divide-zinc-100 dark:divide-zinc-800/50">
+        {Array.from({ length: rows }).map((_, rowIndex) => (
+          <div key={`row-${rowIndex}`} className="p-4 flex items-center gap-4 min-h-[56px]">
+            {Array.from({ length: columns }).map((_, colIndex) => (
+              <Skeleton
+                key={`cell-${rowIndex}-${colIndex}`}
+                className={cn(
+                  "h-4",
+                  colIndex === 0 ? "w-28 font-medium" : effectiveWidths[colIndex % effectiveWidths.length],
+                )}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+
+      {showPagination && (
+        <div className="p-4 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
+          <Skeleton className="h-4 w-32" />
+          <div className="flex gap-2">
+            <Skeleton className="h-8 w-16 rounded-lg" />
+            <Skeleton className="h-8 w-16 rounded-lg" />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export interface CardSkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
   hasBadge?: boolean;
   hasIcon?: boolean;
 }
 
-/**
- * Dimension-matched skeleton for KPI and Stat metric cards (prevents layout shift).
- */
 export const CardSkeleton: React.FC<CardSkeletonProps> = ({
   className,
   hasBadge = true,
@@ -78,18 +274,14 @@ export const CardSkeleton: React.FC<CardSkeletonProps> = ({
 };
 CardSkeleton.displayName = "CardSkeleton";
 
-export interface TableSkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface TableSkeletonLegacyProps extends React.HTMLAttributes<HTMLDivElement> {
   rows?: number;
   columns?: number;
   columnWidths?: string[];
   showHeader?: boolean;
 }
 
-/**
- * Dimension-matched skeleton loader for tabular data.
- * Exact cell heights and customizable column widths prevent Cumulative Layout Shift (CLS).
- */
-export const TableSkeleton: React.FC<TableSkeletonProps> = ({
+export const TableSkeleton: React.FC<TableSkeletonLegacyProps> = ({
   rows = 5,
   columns = 4,
   columnWidths,
@@ -97,7 +289,7 @@ export const TableSkeleton: React.FC<TableSkeletonProps> = ({
   className,
   ...props
 }) => {
-  const effectiveWidths = columnWidths || Array(columns).fill("w-full");
+  const effectiveWidths = columnWidths || Array.from({ length: columns }, () => "w-full");
 
   return (
     <div
@@ -109,7 +301,6 @@ export const TableSkeleton: React.FC<TableSkeletonProps> = ({
       )}
       {...props}
     >
-      {/* Table Header */}
       {showHeader && (
         <div className="flex items-center border-b border-slate-200 dark:border-zinc-800 bg-slate-50/60 dark:bg-zinc-900/80 px-6 py-4">
           {Array.from({ length: columns }).map((_, colIndex) => (
@@ -123,13 +314,9 @@ export const TableSkeleton: React.FC<TableSkeletonProps> = ({
         </div>
       )}
 
-      {/* Table Rows */}
       <div className="divide-y divide-slate-100 dark:divide-zinc-800/60">
         {Array.from({ length: rows }).map((_, rowIndex) => (
-          <div
-            key={`row-${rowIndex}`}
-            className="flex items-center px-6 py-4 min-h-[56px] transition-colors"
-          >
+          <div key={`row-${rowIndex}`} className="flex items-center px-6 py-4 min-h-[56px] transition-colors">
             {Array.from({ length: columns }).map((_, colIndex) => (
               <div
                 key={`cell-${rowIndex}-${colIndex}`}
@@ -157,13 +344,7 @@ TableSkeleton.displayName = "TableSkeleton";
 
 export interface CampaignCardSkeletonProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-/**
- * Dimension-matched skeleton for campaign cards in Advertiser/Affiliate directories.
- */
-export const CampaignCardSkeleton: React.FC<CampaignCardSkeletonProps> = ({
-  className,
-  ...props
-}) => {
+export const CampaignCardSkeleton: React.FC<CampaignCardSkeletonProps> = ({ className, ...props }) => {
   return (
     <div
       role="status"
@@ -174,7 +355,6 @@ export const CampaignCardSkeleton: React.FC<CampaignCardSkeletonProps> = ({
       )}
       {...props}
     >
-      {/* Top row: Title and Status Badge */}
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-2 flex-1">
           <Skeleton className="h-6 w-3/4 max-w-[220px]" />
@@ -183,7 +363,6 @@ export const CampaignCardSkeleton: React.FC<CampaignCardSkeletonProps> = ({
         <Skeleton className="h-6 w-20 rounded-full shrink-0" />
       </div>
 
-      {/* Stats row (3 columns) */}
       <div className="grid grid-cols-3 gap-3 p-3.5 rounded-xl bg-slate-50 dark:bg-zinc-950/60 border border-slate-100 dark:border-zinc-800/60">
         <div className="space-y-1.5">
           <Skeleton className="h-3 w-14" />
@@ -199,7 +378,6 @@ export const CampaignCardSkeleton: React.FC<CampaignCardSkeletonProps> = ({
         </div>
       </div>
 
-      {/* Escrow Progress Bar */}
       <div className="space-y-2">
         <div className="flex justify-between items-center">
           <Skeleton className="h-3 w-24" />
@@ -208,7 +386,6 @@ export const CampaignCardSkeleton: React.FC<CampaignCardSkeletonProps> = ({
         <Skeleton className="h-2.5 w-full rounded-full" />
       </div>
 
-      {/* Action buttons */}
       <div className="flex items-center justify-end space-x-2 pt-1">
         <Skeleton className="h-9 w-24 rounded-xl" />
         <Skeleton className="h-9 w-28 rounded-xl" />
@@ -223,16 +400,12 @@ export interface ChartSkeletonProps extends React.HTMLAttributes<HTMLDivElement>
   barCount?: number;
 }
 
-/**
- * Dimension-matched skeleton for graphical analytics and performance charts.
- */
 export const ChartSkeleton: React.FC<ChartSkeletonProps> = ({
   height = 240,
   barCount = 7,
   className,
   ...props
 }) => {
-  // Staggered heights to simulate an active bar chart
   const barHeights = [45, 75, 60, 90, 40, 85, 65, 95, 55, 70, 80, 50];
 
   return (
@@ -245,7 +418,6 @@ export const ChartSkeleton: React.FC<ChartSkeletonProps> = ({
       )}
       {...props}
     >
-      {/* Chart Header & Controls */}
       <div className="flex items-center justify-between">
         <div className="space-y-1.5">
           <Skeleton className="h-5 w-36" />
@@ -257,7 +429,6 @@ export const ChartSkeleton: React.FC<ChartSkeletonProps> = ({
         </div>
       </div>
 
-      {/* Bar Chart Graphic Area */}
       <div
         className="flex items-end justify-between gap-3 pt-4 border-b border-slate-100 dark:border-zinc-800/80"
         style={{ height: `${height}px` }}
@@ -275,7 +446,6 @@ export const ChartSkeleton: React.FC<ChartSkeletonProps> = ({
         })}
       </div>
 
-      {/* X-Axis Labels */}
       <div className="flex justify-between items-center px-1">
         {Array.from({ length: barCount }).map((_, i) => (
           <Skeleton key={`axis-${i}`} className="h-3 w-8" />
@@ -290,9 +460,6 @@ export interface FormSkeletonProps extends React.HTMLAttributes<HTMLDivElement> 
   fieldsCount?: number;
 }
 
-/**
- * Dimension-matched skeleton for form inputs, text areas, and submit buttons.
- */
 export const FormSkeleton: React.FC<FormSkeletonProps> = ({
   fieldsCount = 3,
   className,
@@ -335,9 +502,6 @@ export interface SkeletonWrapperProps {
   className?: string;
 }
 
-/**
- * Convenience wrapper component to toggle between skeleton and content seamlessly.
- */
 export const SkeletonWrapper: React.FC<SkeletonWrapperProps> = ({
   isLoading,
   skeleton,

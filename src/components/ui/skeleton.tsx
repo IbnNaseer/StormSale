@@ -13,6 +13,7 @@ export function Skeleton({ className, variant = "default", ...props }: SkeletonP
   return (
     <div
       role="status"
+      aria-live="polite"
       aria-label="Loading..."
       className={cn(
         "animate-pulse rounded-md",

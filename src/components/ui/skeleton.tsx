@@ -7,7 +7,7 @@ export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
 
 /**
  * Base Skeleton component with pulse animation and theme-aware background colors.
- * Merges both the legacy and PR variants to keep compatibility with the older API and the newer dashboard designs.
+ * Merges the legacy and PR variants so both APIs remain compatible.
  */
 export const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
   ({ className, variant = "default", ...props }, ref) => {
@@ -39,6 +39,10 @@ export const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
 );
 Skeleton.displayName = "Skeleton";
 
+/**
+ * Text block skeleton rendering multiple lines of varying realistic widths
+ * to prevent cumulative layout shift (CLS).
+ */
 export interface SkeletonTextProps extends React.HTMLAttributes<HTMLDivElement> {
   lines?: number;
   lineClassName?: string;
@@ -59,6 +63,9 @@ export function SkeletonText({ lines = 3, className, lineClassName, ...props }: 
   );
 }
 
+/**
+ * Circular avatar skeleton for user profiles and wallet icons.
+ */
 export interface SkeletonAvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   size?: "sm" | "md" | "lg" | "xl";
 }
@@ -74,6 +81,9 @@ export function SkeletonAvatar({ size = "md", className, ...props }: SkeletonAva
   return <Skeleton className={cn("rounded-full shrink-0", sizeClasses[size], className)} {...props} />;
 }
 
+/**
+ * Button-shaped skeleton matching standard button dimensions.
+ */
 export interface SkeletonButtonProps extends React.HTMLAttributes<HTMLDivElement> {
   size?: "sm" | "default" | "lg" | "icon";
 }
@@ -89,6 +99,10 @@ export function SkeletonButton({ size = "default", className, ...props }: Skelet
   return <Skeleton className={cn(sizeClasses[size], className)} {...props} />;
 }
 
+/**
+ * Metric/KPI card skeleton for dashboard stat cards.
+ * Matches exact height and spacing of live overview widgets.
+ */
 export interface SkeletonMetricProps extends React.HTMLAttributes<HTMLDivElement> {
   hasSubtext?: boolean;
 }
@@ -119,6 +133,10 @@ export function SkeletonMetric({ hasSubtext = true, className, ...props }: Skele
   );
 }
 
+/**
+ * Dashboard widget card skeleton matching Card, CardHeader, and CardContent
+ * dimensions to eliminate layout shifts when loading charts or complex widgets.
+ */
 export interface SkeletonWidgetProps extends React.HTMLAttributes<HTMLDivElement> {
   height?: string | number;
   showHeaderAction?: boolean;
@@ -161,6 +179,11 @@ export function SkeletonWidget({
   );
 }
 
+/**
+ * Table skeleton loader matching Table, TableHeader, TableRow, and TableCell.
+ * Configurable row and column counts ensure exact dimension parity with live data.
+ * This version merges both old and new prop contracts.
+ */
 export interface SkeletonTableProps extends React.HTMLAttributes<HTMLDivElement> {
   rows?: number;
   columns?: number;
@@ -169,7 +192,7 @@ export interface SkeletonTableProps extends React.HTMLAttributes<HTMLDivElement>
   showHeader?: boolean;
 }
 
-export function SkeletonTable({
+export const TableSkeleton: React.FC<SkeletonTableProps> = ({
   rows = 5,
   columns = 4,
   showPagination = true,
@@ -177,9 +200,17 @@ export function SkeletonTable({
   showHeader = true,
   className,
   ...props
-}: SkeletonTableProps) {
-  const legacyColumnWidths = ["w-1/4", "w-1/3", "w-1/5", "w-1/6", "w-1/4"];
-  const effectiveWidths = columnWidths || Array.from({ length: columns }, (_, index) => legacyColumnWidths[index % legacyColumnWidths.length]);
+}) => {
+  const legacyColumnWidths = [
+    "w-1/4",
+    "w-1/3",
+    "w-1/5",
+    "w-1/6",
+    "w-1/4",
+  ];
+  const effectiveWidths =
+    columnWidths ||
+    Array.from({ length: columns }, (_, index) => legacyColumnWidths[index % legacyColumnWidths.length]);
 
   return (
     <div
@@ -206,7 +237,10 @@ export function SkeletonTable({
 
       <div className="divide-y divide-zinc-100 dark:divide-zinc-800/50">
         {Array.from({ length: rows }).map((_, rowIndex) => (
-          <div key={`row-${rowIndex}`} className="p-4 flex items-center gap-4 min-h-[56px]">
+          <div
+            key={`row-${rowIndex}`}
+            className="p-4 flex items-center gap-4 min-h-[56px]"
+          >
             {Array.from({ length: columns }).map((_, colIndex) => (
               <Skeleton
                 key={`cell-${rowIndex}-${colIndex}`}
@@ -231,7 +265,9 @@ export function SkeletonTable({
       )}
     </div>
   );
-}
+};
+
+export const SkeletonTable = TableSkeleton;
 
 export interface CardSkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
   hasBadge?: boolean;
@@ -273,74 +309,6 @@ export const CardSkeleton: React.FC<CardSkeletonProps> = ({
   );
 };
 CardSkeleton.displayName = "CardSkeleton";
-
-export interface TableSkeletonLegacyProps extends React.HTMLAttributes<HTMLDivElement> {
-  rows?: number;
-  columns?: number;
-  columnWidths?: string[];
-  showHeader?: boolean;
-}
-
-export const TableSkeleton: React.FC<TableSkeletonLegacyProps> = ({
-  rows = 5,
-  columns = 4,
-  columnWidths,
-  showHeader = true,
-  className,
-  ...props
-}) => {
-  const effectiveWidths = columnWidths || Array.from({ length: columns }, () => "w-full");
-
-  return (
-    <div
-      role="status"
-      aria-label="Loading table..."
-      className={cn(
-        "w-full overflow-hidden rounded-2xl border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900/40",
-        className,
-      )}
-      {...props}
-    >
-      {showHeader && (
-        <div className="flex items-center border-b border-slate-200 dark:border-zinc-800 bg-slate-50/60 dark:bg-zinc-900/80 px-6 py-4">
-          {Array.from({ length: columns }).map((_, colIndex) => (
-            <div
-              key={`header-col-${colIndex}`}
-              className={cn("flex-1 px-2 first:pl-0 last:pr-0", effectiveWidths[colIndex])}
-            >
-              <Skeleton className="h-4 w-3/4 max-w-[120px]" />
-            </div>
-          ))}
-        </div>
-      )}
-
-      <div className="divide-y divide-slate-100 dark:divide-zinc-800/60">
-        {Array.from({ length: rows }).map((_, rowIndex) => (
-          <div key={`row-${rowIndex}`} className="flex items-center px-6 py-4 min-h-[56px] transition-colors">
-            {Array.from({ length: columns }).map((_, colIndex) => (
-              <div
-                key={`cell-${rowIndex}-${colIndex}`}
-                className={cn("flex-1 px-2 first:pl-0 last:pr-0", effectiveWidths[colIndex])}
-              >
-                <Skeleton
-                  className={cn(
-                    "h-4",
-                    colIndex === 0
-                      ? "w-4/5 max-w-[180px]"
-                      : colIndex === columns - 1
-                        ? "w-1/2 max-w-[90px]"
-                        : "w-2/3 max-w-[140px]",
-                  )}
-                />
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-TableSkeleton.displayName = "TableSkeleton";
 
 export interface CampaignCardSkeletonProps extends React.HTMLAttributes<HTMLDivElement> {}
 

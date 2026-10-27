@@ -5,101 +5,116 @@ import { JoinCampaignButton } from "../components/affiliate/JoinCampaignButton";
 import { SalesList } from "../components/affiliate/SalesList";
 import { ClaimPayouts } from "../components/affiliate/ClaimPayouts";
 import { AffiliateOverview } from "../components/affiliate/AffiliateOverview";
+import { AffiliateClickStreamHeatmap } from "../components/affiliate/ClickStreamHeatmap";
 import { TelegramCampaignBrowser } from "../components/affiliate/TelegramCampaignBrowser";
+import { CustomLinksManager } from "../components/affiliate/CustomLinksManager";
+import { CampaignApplication } from "../components/affiliate/CampaignApplication";
+import { AffiliateLeaderboard } from "../components/affiliate/AffiliateLeaderboard";
+import { MilestoneBadges } from "../components/affiliate/MilestoneBadges";
 import {
   Users,
   TrendingUp,
   DollarSign,
   Shield,
   LayoutDashboard,
+  Globe2,
   Send,
   Sliders,
+  Link2,
+  Trophy,
+  Award,
 } from "lucide-react";
 import { NotificationProvider } from "../context/NotificationContext";
 import { usePreference } from "../hooks/usePreference";
 import { motion, AnimatePresence } from "framer-motion";
 import { isTelegramMiniApp } from "../lib/telegram";
 import { AffiliateSettings } from "../components/affiliate/AffiliateSettings";
+import { TelegramAlertsCard } from "../components/affiliate/TelegramAlertsCard";
 import { Button } from "../components/ui/button";
-
 
 interface AffiliateProps {
   onBack: () => void;
+  initialTab?: string;
 }
 
 const AFFILIATE_TABS = [
   "overview",
+  "heatmap",
   "telegram-browser",
+  "custom-links",
+  "leaderboard",
+  "milestones",
   "join-campaign",
   "my-sales",
   "claim-payouts",
   "settings",
   "security",
+  "apply-links",
 ] as const;
 type AffiliateTab = (typeof AFFILIATE_TABS)[number];
 
-const AffiliateContent: React.FC<AffiliateProps> = ({ onBack }) => {
-  const { t } = useTranslation();
+const AffiliateContent: React.FC<AffiliateProps> = ({ onBack, initialTab = "overview" }) => {
   const [activeTab, setActiveTab] = usePreference<AffiliateTab>(
     "stormsale.affiliate.tab",
-    isTelegramMiniApp() ? "telegram-browser" : "overview",
+    AFFILIATE_TABS.includes(initialTab as AffiliateTab)
+      ? (initialTab as AffiliateTab)
+      : isTelegramMiniApp()
+        ? "telegram-browser"
+        : "overview",
     (v) => AFFILIATE_TABS.includes(v as AffiliateTab),
   );
 
   const tabs = [
-    {
-      id: "overview",
-      label: t("affiliate.dashboardOverview", "Dashboard Overview"),
-      icon: LayoutDashboard,
-    },
-    {
-      id: "telegram-browser",
-      label: t("affiliate.telegramCampaigns", "Telegram Campaigns"),
-      icon: Send,
-    },
-    {
-      id: "join-campaign",
-      label: t("affiliate.joinCampaign", "Join Campaign"),
-      icon: Users,
-    },
-    {
-      id: "my-sales",
-      label: t("affiliate.mySales", "My Sales & Commissions"),
-      icon: DollarSign,
-    },
-    {
-      id: "claim-payouts",
-      label: t("affiliate.claimPayouts", "Claim Payouts"),
-      icon: TrendingUp,
-    },
-    {
-      id: "settings",
-      label: t("affiliate.personalizedSettings", "Personalized Settings"),
-      icon: Sliders,
-    },
-    {
-      id: "security",
-      label: t("affiliate.securityKeys", "Security & Keys"),
-      icon: Shield,
-    },
+    { id: "overview", label: "Dashboard Overview", icon: LayoutDashboard },
+    { id: "heatmap", label: "Click Heatmap", icon: Globe2 },
+    { id: "telegram-browser", label: "Telegram Campaigns", icon: Send },
+    { id: "custom-links", label: "Custom Short Links", icon: Link2 },
+    { id: "leaderboard", label: "Leaderboards", icon: Trophy },
+    { id: "milestones", label: "Milestone Badges", icon: Award },
+    { id: "join-campaign", label: "Join Campaign", icon: Users },
+    { id: "apply-links", label: "Apply & Tracking Links", icon: Link2 },
+    { id: "my-sales", label: "My Sales & Commissions", icon: DollarSign },
+    { id: "claim-payouts", label: "Claim Payouts", icon: TrendingUp },
+    { id: "settings", label: "Personalized Settings", icon: Sliders },
+    { id: "security", label: "Security & Keys", icon: Shield },
   ];
 
   const renderContent = () => {
     switch (activeTab) {
+      case "heatmap":
+        return <AffiliateClickStreamHeatmap />;
       case "telegram-browser":
         return <TelegramCampaignBrowser />;
+      case "custom-links":
+        return <CustomLinksManager />;
+      case "leaderboard":
+        return <AffiliateLeaderboard onSelectMilestones={() => setActiveTab("milestones")} />;
+      case "milestones":
+        return <MilestoneBadges />;
       case "join-campaign":
         return <JoinCampaignButton />;
+      case "apply-links":
+        return <CampaignApplication />;
       case "my-sales":
         return <SalesList />;
       case "claim-payouts":
         return <ClaimPayouts />;
       case "settings":
-        return <AffiliateSettings />;
+        return (
+          <div className="space-y-6">
+            <AffiliateSettings />
+            <TelegramAlertsCard />
+          </div>
+        );
       case "overview":
-        return <AffiliateOverview />;
       default:
-        return <AffiliateOverview />;
+        return (
+          <AffiliateOverview
+            onNavigate={setActiveTab}
+            onNavigateToLeaderboard={() => setActiveTab("leaderboard")}
+            onNavigateToMilestones={() => setActiveTab("milestones")}
+          />
+        );
     }
   };
 

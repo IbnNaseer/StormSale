@@ -2,6 +2,8 @@ import { Button } from "../../components/ui/button";
 import { useWeb3 } from "../../hooks/useWeb3";
 import { useTelegram } from "../../hooks/useTelegram";
 import { ThemeToggle } from "./ThemeToggle";
+import { LanguageSelector } from "./LanguageSelector";
+import { useTranslation } from "react-i18next";
 import { TerminologyTooltip, TerminologyGuideButton } from "../ui/tooltip";
 import {
   Wallet,
@@ -46,6 +48,7 @@ export const resolveWalletNetwork = async (
  * Application header with wallet navigation, status indicators, and network verification controls.
  */
 export const Header = ({ onNavigate }: HeaderProps) => {
+  const { t } = useTranslation();
   const {
     userAddress,
     openWalletModal,
@@ -222,6 +225,7 @@ export const Header = ({ onNavigate }: HeaderProps) => {
               </span>
             )}
           </button>
+          <LanguageSelector />
           <ThemeToggle />
 
           {isConnected ? (
@@ -410,7 +414,7 @@ export const Header = ({ onNavigate }: HeaderProps) => {
                   }}
                   className="w-full rounded-xl text-xs font-bold text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-900/50 hover:bg-rose-50 dark:hover:bg-rose-950/20"
                 >
-                  {t("header.disconnect", "Disconnect Wallet")}
+                  {t("header.disconnectWallet", "Disconnect Wallet")}
                 </Button>
               ) : (
                 <Button
@@ -421,7 +425,7 @@ export const Header = ({ onNavigate }: HeaderProps) => {
                   className="w-full rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs"
                 >
                   <Wallet className="w-3.5 h-3.5 mr-2" />
-                  {t("header.connectWallet", "Select Stellar Wallet")}
+                  {t("header.selectStellarWallet", "Select Stellar Wallet")}
                 </Button>
               )}
             </div>

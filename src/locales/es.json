@@ -14,7 +14,9 @@
     "connectWallet": "Conectar Billetera",
     "disconnect": "Desconectar",
     "switchLanguage": "Cambiar Idioma",
-    "theme": "Cambiar Tema"
+    "theme": "Cambiar Tema",
+    "disconnectWallet": "Desconectar Billetera",
+    "selectStellarWallet": "Seleccionar Billetera Stellar"
   },
   "common": {
     "loading": "Cargando...",
@@ -111,7 +113,8 @@
     "mySales": "Mis Ventas y Comisiones",
     "claimPayouts": "Reclamar Pagos",
     "personalizedSettings": "Configuraciones Personalizadas",
-    "securityKeys": "Seguridad y Claves"
+    "securityKeys": "Seguridad y Claves",
+    "preferences": "Preferencias"
   },
   "advertiser": {
     "title": "Portal de Anunciantes",

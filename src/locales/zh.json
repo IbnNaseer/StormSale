@@ -14,7 +14,9 @@
     "connectWallet": "连接钱包",
     "disconnect": "断开连接",
     "switchLanguage": "切换语言",
-    "theme": "切换主题"
+    "theme": "切换主题",
+    "disconnectWallet": "断开钱包连接",
+    "selectStellarWallet": "选择 Stellar 钱包"
   },
   "common": {
     "loading": "加载中...",
@@ -111,7 +113,8 @@
     "mySales": "我的销售与佣金",
     "claimPayouts": "领取付款",
     "personalizedSettings": "个性化设置",
-    "securityKeys": "安全与密钥"
+    "securityKeys": "安全与密钥",
+    "preferences": "偏好设置"
   },
   "advertiser": {
     "title": "广告主中心",

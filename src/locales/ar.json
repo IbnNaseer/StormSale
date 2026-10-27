@@ -14,7 +14,9 @@
     "connectWallet": "ربط المحفظة",
     "disconnect": "قطع الاتصال",
     "switchLanguage": "تغيير اللغة",
-    "theme": "تبديل المظهر"
+    "theme": "تبديل المظهر",
+    "disconnectWallet": "قطع اتصال المحفظة",
+    "selectStellarWallet": "اختر محفظة Stellar"
   },
   "common": {
     "loading": "جار التحميل...",
@@ -111,7 +113,8 @@
     "mySales": "مبيعاتي وعمولاتي",
     "claimPayouts": "المطالبة بالمدفوعات",
     "personalizedSettings": "الإعدادات المخصصة",
-    "securityKeys": "الأمان والمفاتيح"
+    "securityKeys": "الأمان والمفاتيح",
+    "preferences": "التفضيلات"
   },
   "advertiser": {
     "title": "بوابة المعلنين",

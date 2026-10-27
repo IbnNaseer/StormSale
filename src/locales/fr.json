@@ -14,7 +14,9 @@
     "connectWallet": "Connecter Portefeuille",
     "disconnect": "Déconnecter",
     "switchLanguage": "Changer de Langue",
-    "theme": "Changer de Thème"
+    "theme": "Changer de Thème",
+    "disconnectWallet": "Déconnecter Portefeuille",
+    "selectStellarWallet": "Sélectionner Portefeuille Stellar"
   },
   "common": {
     "loading": "Chargement...",
@@ -111,7 +113,8 @@
     "mySales": "Mes Ventes & Commissions",
     "claimPayouts": "Réclamer les Paiements",
     "personalizedSettings": "Paramètres Personnalisés",
-    "securityKeys": "Sécurité & Clés"
+    "securityKeys": "Sécurité & Clés",
+    "preferences": "Préférences"
   },
   "advertiser": {
     "title": "Portail Annonceur",

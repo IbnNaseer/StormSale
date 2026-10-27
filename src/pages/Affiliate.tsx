@@ -54,6 +54,7 @@ const AFFILIATE_TABS = [
 type AffiliateTab = (typeof AFFILIATE_TABS)[number];
 
 const AffiliateContent: React.FC<AffiliateProps> = ({ onBack, initialTab = "overview" }) => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = usePreference<AffiliateTab>(
     "stormsale.affiliate.tab",
     AFFILIATE_TABS.includes(initialTab as AffiliateTab)
@@ -148,12 +149,12 @@ const AffiliateContent: React.FC<AffiliateProps> = ({ onBack, initialTab = "over
                 variant={activeTab === "settings" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setActiveTab("settings")}
-                aria-label={t("affiliate.personalizedSettings", "Preferences")}
+                aria-label={t("affiliate.preferences", "Preferences")}
                 className="rounded-xl h-10 px-4 font-semibold text-xs flex items-center space-x-1.5 border border-slate-200 dark:border-zinc-800"
               >
                 <Sliders className="w-4 h-4" />
                 <span className="hidden sm:inline">
-                  {t("affiliate.personalizedSettings", "Preferences")}
+                  {t("affiliate.preferences", "Preferences")}
                 </span>
               </Button>
             </div>

@@ -313,6 +313,7 @@ export const AffiliateOverview: React.FC<AffiliateOverviewProps> = ({
   onNavigateToLeaderboard,
   onNavigateToMilestones,
 }) => {
+  const { t } = useTranslation();
   const { userAddress } = useWeb3();
   const profile = getAffiliateProfile(userAddress || "", userAddress);
   const stats = [

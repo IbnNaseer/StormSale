@@ -14,7 +14,9 @@
     "connectWallet": "ウォレットを接続",
     "disconnect": "切断",
     "switchLanguage": "言語を切り替える",
-    "theme": "テーマ切り替え"
+    "theme": "テーマ切り替え",
+    "disconnectWallet": "ウォレットを切断",
+    "selectStellarWallet": "Stellarウォレットを選択"
   },
   "common": {
     "loading": "読み込み中...",
@@ -111,7 +113,8 @@
     "mySales": "売上と報酬",
     "claimPayouts": "支払いを請求",
     "personalizedSettings": "パーソナライズ設定",
-    "securityKeys": "セキュリティと鍵"
+    "securityKeys": "セキュリティと鍵",
+    "preferences": "設定"
   },
   "advertiser": {
     "title": "広告主ポータル",

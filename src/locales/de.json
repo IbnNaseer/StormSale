@@ -14,7 +14,9 @@
     "connectWallet": "Wallet verbinden",
     "disconnect": "Trennen",
     "switchLanguage": "Sprache wechseln",
-    "theme": "Design wechseln"
+    "theme": "Design wechseln",
+    "disconnectWallet": "Wallet trennen",
+    "selectStellarWallet": "Stellar Wallet auswählen"
   },
   "common": {
     "loading": "Wird geladen...",
@@ -111,7 +113,8 @@
     "mySales": "Meine Verkäufe & Provisionen",
     "claimPayouts": "Auszahlungen Anfordern",
     "personalizedSettings": "Personalisierte Einstellungen",
-    "securityKeys": "Sicherheit & Schlüssel"
+    "securityKeys": "Sicherheit & Schlüssel",
+    "preferences": "Einstellungen"
   },
   "advertiser": {
     "title": "Werbetreibenden-Portal",

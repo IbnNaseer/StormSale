@@ -14,7 +14,9 @@
     "connectWallet": "Connect Wallet",
     "disconnect": "Disconnect",
     "switchLanguage": "Switch Language",
-    "theme": "Toggle Theme"
+    "theme": "Toggle Theme",
+    "disconnectWallet": "Disconnect Wallet",
+    "selectStellarWallet": "Select Stellar Wallet"
   },
   "common": {
     "loading": "Loading...",
@@ -78,12 +80,12 @@
     "tipEngageAudience": "Engage with your audience regularly",
     "encryptedLinkTitle": "Encrypted link & QR code",
     "encryptedLinkSubtitle": "Create a private, campaign-specific tracking link to share anywhere.",
-    "affiliateWalletLabel": "Affiliate Wallet Address",
+    "affiliateWalletLabel": "Affiliate wallet",
     "campaignIdLabel": "Campaign ID",
-    "generateLinkButton": "Generate Encrypted Link",
+    "generateLinkButton": "Generate link & QR code",
     "generatingLinkButton": "Generating...",
     "shareableLinkLabel": "Shareable Encrypted Link",
-    "copyLink": "Copy link",
+    "copyLink": "Copy affiliate link",
     "roleSelectorTitle": "Select Your Role",
     "roleSelectorSubtitle": "Choose how you want to interact with the StormSale protocol",
     "roleAdvertiserTitle": "Advertiser",
@@ -111,7 +113,8 @@
     "mySales": "My Sales & Commissions",
     "claimPayouts": "Claim Payouts",
     "personalizedSettings": "Personalized Settings",
-    "securityKeys": "Security & Keys"
+    "securityKeys": "Security & Keys",
+    "preferences": "Preferences"
   },
   "advertiser": {
     "title": "Advertiser Portal",

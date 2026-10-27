@@ -14,7 +14,9 @@
     "connectWallet": "Подключить кошелек",
     "disconnect": "Отключить",
     "switchLanguage": "Сменить язык",
-    "theme": "Сменить тему"
+    "theme": "Сменить тему",
+    "disconnectWallet": "Отключить кошелек",
+    "selectStellarWallet": "Выбрать кошелек Stellar"
   },
   "common": {
     "loading": "Загрузка...",
@@ -111,7 +113,8 @@
     "mySales": "Мои продажи и комиссии",
     "claimPayouts": "Запросить выплаты",
     "personalizedSettings": "Персональные настройки",
-    "securityKeys": "Безопасность и ключи"
+    "securityKeys": "Безопасность и ключи",
+    "preferences": "Настройки"
   },
   "advertiser": {
     "title": "Портал рекламодателя",

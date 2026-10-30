@@ -94,7 +94,7 @@
     "roleAffiliateDesc": "Discover top campaigns, share private referral links, and earn instant commissions.",
     "roleAuditorTitle": "Auditor",
     "roleAuditorDesc": "Verify zero-knowledge cryptographic proofs, audits, and ensure protocol compliance.",
-    "assumeRole": "Assume Role",
+    "assumeRole": "Sign & Assume Role",
     "switchRole": "Switch Role",
     "connectedWallet": "Connected",
     "network": "Network"

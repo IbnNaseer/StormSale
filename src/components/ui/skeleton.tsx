@@ -235,12 +235,7 @@ export const TableSkeleton: React.FC<SkeletonTableProps> = ({
             {Array.from({ length: columns }).map((_, colIndex) => (
               <Skeleton
                 key={`cell-${rowIndex}-${colIndex}`}
-                className={cn(
-                  "h-4",
-                  colIndex === 0
-                    ? "w-28 font-medium"
-                    : effectiveWidths[colIndex % effectiveWidths.length],
-                )}
+                className={cn("h-4", effectiveWidths[colIndex % effectiveWidths.length])}
               />
             ))}
           </div>

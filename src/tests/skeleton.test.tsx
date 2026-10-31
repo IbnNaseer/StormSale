@@ -108,6 +108,15 @@ describe("SkeletonLoader System (#7, #4) + Visual Feedback & Skeleton System (#1
     expect(html).toContain("w-1/4");
     expect(html).toContain("w-1/2");
     expect(html).toContain("border-zinc-200");
+    expect(html).toContain("bg-zinc-50");
+    expect(html).not.toContain("w-1/3");
+    expect(html).not.toContain("w-1/5");
+    expect(html).not.toContain("w-1/6");
+
+    const htmlNoHeader = renderToStaticMarkup(
+      <SkeletonTable rows={3} columns={3} showHeader={false} />,
+    );
+    expect(htmlNoHeader).not.toContain("bg-zinc-50");
   });
 
   it("renders CampaignCardSkeleton matching directory cards", () => {

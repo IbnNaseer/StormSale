@@ -107,7 +107,7 @@ describe("SkeletonLoader System (#7, #4) + Visual Feedback & Skeleton System (#1
     expect(html).toContain("min-h-[56px]");
     expect(html).toContain("w-1/4");
     expect(html).toContain("w-1/2");
-    expect(html).toContain("border-slate-200");
+    expect(html).toContain("border-zinc-200");
   });
 
   it("renders CampaignCardSkeleton matching directory cards", () => {

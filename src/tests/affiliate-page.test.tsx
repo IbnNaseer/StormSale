@@ -3,6 +3,11 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Affiliate } from "../pages/Affiliate";
 
+vi.mock("framer-motion", () => ({
+  motion: { div: ({ children, ...props }: any) => <div {...props}>{children}</div> },
+  AnimatePresence: ({ children }: any) => <>{children}</>,
+}));
+
 vi.mock("../components/shared/Sidebar", () => ({
   Sidebar: ({
     tabs,
